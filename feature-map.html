@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pynch — Feature Map v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e8e8ec;
+    min-height: 100vh;
+    padding: 36px 28px;
+  }
+
+  .header { margin-bottom: 36px; }
+  .header h1 {
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FF4D5A 0%, #C84B9E 50%, #7B50C8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .header-meta { font-size: 12px; color: #555; line-height: 1.6; }
+  .header-meta strong { color: #888; font-weight: 600; }
+  .header-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #444;
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    padding: 6px 12px;
+  }
+  .header-hint em { color: #FF4D5A; font-style: normal; }
+
+  .legend {
+    display: flex;
+    gap: 6px 18px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .legend-group { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
+  .legend-sep { width: 1px; height: 16px; background: #2a2a3a; flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #777; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+  .board { display: flex; flex-direction: column; gap: 28px; }
+
+  .swimlane {
+    background: #12121a;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #1e1e2e;
+  }
+  .swimlane-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #1e1e2e;
+    flex-wrap: wrap;
+  }
+  .swimlane-icon { font-size: 20px; flex-shrink: 0; }
+  .swimlane-title { font-size: 15px; font-weight: 700; color: #e8e8ec; }
+  .swimlane-count {
+    font-size: 10px; color: #555;
+    background: #1a1a26; padding: 2px 7px;
+    border-radius: 8px; font-weight: 600;
+  }
+  .swimlane-subtitle { font-size: 11px; color: #444; margin-left: auto; }
+  .swimlane-new {
+    font-size: 9px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #FF4D5A;
+    background: rgba(255,77,90,0.1);
+    border: 1px solid rgba(255,77,90,0.2);
+    border-radius: 4px; padding: 2px 6px;
+  }
+
+  .cards { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .card {
+    flex: 0 0 200px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, flex-basis 0.3s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+  .card.expanded {
+    flex: 1 1 100%;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .card.live     { background: rgba(0,212,170,0.05); border-color: rgba(0,212,170,0.2); }
+  .card.live     .card-title { color: #00D4AA; }
+  .card.live     .status-tag { background: rgba(0,212,170,0.1); color: #00D4AA; border-color: rgba(0,212,170,0.25); }
+  .card.building { background: rgba(255,177,60,0.05); border-color: rgba(255,177,60,0.2); }
+  .card.building .card-title { color: #FFB13C; }
+  .card.building .status-tag { background: rgba(255,177,60,0.1); color: #FFB13C; border-color: rgba(255,177,60,0.25); }
+  .card.planned  { background: rgba(123,80,200,0.05); border-color: rgba(123,80,200,0.2); }
+  .card.planned  .card-title { color: #A78BFA; }
+  .card.planned  .status-tag { background: rgba(123,80,200,0.1); color: #A78BFA; border-color: rgba(123,80,200,0.25); }
+  .card.idea     { background: rgba(90,90,110,0.05); border-color: rgba(90,90,110,0.2); }
+  .card.idea     .card-title { color: #777; }
+  .card.idea     .status-tag { background: rgba(90,90,110,0.1); color: #666; border-color: rgba(90,90,110,0.2); }
+
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+  .card-title { font-size: 13px; font-weight: 700; line-height: 1.3; flex: 1; }
+  .card-chevron {
+    font-size: 9px; color: #2a2a3a; flex-shrink: 0;
+    margin-top: 3px; transition: transform 0.3s ease, color 0.2s ease;
+  }
+  .card.expanded .card-chevron { transform: rotate(180deg); color: #666; }
+
+  .card-desc { font-size: 11.5px; line-height: 1.5; color: #666; margin-bottom: 10px; }
+  .card-footer { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+
+  .tier-badge {
+    display: inline-block;
+    font-size: 9px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 3px 7px; border-radius: 4px;
+    cursor: pointer; user-select: none;
+    transition: transform 0.1s ease;
+    position: relative; z-index: 2;
+  }
+  .tier-badge:hover { transform: scale(1.05); }
+  .tier-badge.mvp    { background: #FF4D5A; color: #fff; }
+  .tier-badge.mlp    { background: #FF8C42; color: #fff; }
+  .tier-badge.future { background: #18181f; color: #444; border: 1px solid #2a2a3a; }
+
+  .status-tag {
+    display: inline-block;
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 3px 7px; border-radius: 4px; border: 1px solid;
+    cursor: pointer; user-select: none;
+    transition: transform 0.1s ease;
+    position: relative; z-index: 2;
+  }
+  .status-tag:hover { transform: scale(1.05); }
+
+  /* Expanded content */
+  .card-details {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-details-inner {
+    padding-top: 16px;
+    margin-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .detail-full-desc {
+    font-size: 13px; line-height: 1.65; color: #aaa; margin-bottom: 18px;
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .detail-section-title {
+    font-size: 9px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.2px; color: #3a3a4a; margin-bottom: 8px;
+  }
+  .detail-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .detail-list li {
+    font-size: 12px; color: #888; padding-left: 18px;
+    position: relative; line-height: 1.45;
+  }
+  .section-sub   .detail-list li::before { content: '◆'; position:absolute; left:0; font-size:6px; top:5px; color:#3a3a4a; }
+  .section-dep   .detail-list li::before { content:'↗'; position:absolute; left:0; font-size:10px; top:1px; color:rgba(255,140,66,0.45); }
+  .section-oq    .detail-list li::before { content:'?'; position:absolute; left:1px; font-size:10px; top:1px; color:#A78BFA; font-weight:800; opacity:0.7; }
+  .section-notes .detail-list li::before { content:'→'; position:absolute; left:0; font-size:10px; top:1px; color:rgba(255,77,90,0.5); }
+
+  /* Open questions section */
+  .oq-section {
+    margin-top: 36px; padding: 20px 22px;
+    background: #12121a; border-radius: 16px; border: 1px solid #1e1e2e;
+  }
+  .oq-section h3 { font-size: 13px; font-weight: 800; color: #FF4D5A; margin-bottom: 14px; }
+  .oq-list { list-style: none; counter-reset: oq; display: flex; flex-direction: column; gap: 10px; }
+  .oq-list li {
+    font-size: 12.5px; color: #888; padding-left: 26px;
+    position: relative; line-height: 1.55; counter-increment: oq;
+  }
+  .oq-list li::before {
+    content: counter(oq);
+    position: absolute; left: 0; width: 16px; height: 16px;
+    background: rgba(255,77,90,0.1); color: #FF4D5A;
+    font-size: 9px; font-weight: 800; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center; top: 2px;
+  }
+
+  .page-footer {
+    margin-top: 28px; padding-top: 16px;
+    border-top: 1px solid #111118;
+    font-size: 10px; color: #282830; text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 14px 12px; }
+    .header h1 { font-size: 22px; }
+    .swimlane { padding: 14px 12px; }
+    .swimlane-subtitle { display: none; }
+    .card { flex: 1 1 calc(50% - 5px); min-width: 120px; }
+    .card.expanded { flex: 1 1 100%; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .legend-sep { display: none; }
+  }
+  @media (max-width: 360px) {
+    .card { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pynch — Feature Map</h1>
+  <p class="header-meta">
+    <strong>v2</strong> &middot; Updated 26 Mar 2026 &middot;
+    Source: Vision Doc v4 + Neel/Khoa sync &middot; 7 workstreams &middot; 24 features
+  </p>
+  <div class="header-hint">
+    <em>▼</em> Click card to expand full notes &nbsp;&middot;&nbsp;
+    <em>●</em> Tap tier + status badges to reassign &nbsp;&middot;&nbsp; saves in browser
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-group">
+    <div class="legend-item"><div class="legend-dot" style="background:#00D4AA"></div> Live</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FFB13C"></div> Building</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#A78BFA"></div> Planned</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#555"></div> Idea</div>
+  </div>
+  <div class="legend-sep"></div>
+  <div class="legend-group">
+    <div class="legend-item"><div class="legend-dot" style="background:#FF4D5A;border-radius:2px"></div> MVP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF8C42;border-radius:2px"></div> MLP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1e1e2e;border:1px solid #2a2a3a;border-radius:2px"></div> Future</div>
+  </div>
+</div>
+
+<div id="board" class="board"></div>
+
+<div class="oq-section">
+  <h3>Open Questions &mdash; Neel + Khoa</h3>
+  <ol class="oq-list">
+    <li>Discovery + DM outreach works for Instagram. The rest isn't automated. Fake it till justified, or build on-demand per customer request?</li>
+    <li>Creator Portal: not MVP but immediately after. How close to MLP? DietFit team is already drowning in creator questions about process, payments, video status &mdash; the pain is live now.</li>
+    <li>Performance tracking is completely greenfield. No existing analytics infra. How much is MVP-blocking vs. post-launch?</li>
+    <li>Payment flow model: Pynch holds float, PSP in the middle, or back-to-back invoicing? Big EU compliance implications. Decision needed before architecture locks in.</li>
+    <li>Campaign Mode needs its own UX design sprint separate from Farm Mode &mdash; when does that happen?</li>
+    <li>UGC campaign metrics: CPV, CPI, ROAS, submission speed, re-submission rate, brief accuracy. What actually matters most to brand customers? Needs customer research.</li>
+    <li>Creator Portfolio as PLG: could be a standalone free product driving brand-side acquisition. Build before or after Creator Portal?</li>
+    <li>AI Content QA: simple version for MVP (auto-screen against brief basics) or park entirely? Already have a Gemini gem doing something similar &mdash; evaluate before rebuilding.</li>
+    <li>Buy vs build for payments infra? Platforms like Deel, Tipalti, Routable already do mass creator payments. Evaluate before building.</li>
+  </ol>
+</div>
+
+<div class="page-footer">
+  Pynch internal tool &mdash; not for external sharing &nbsp;&middot;&nbsp; Toggle states persist in your browser localStorage
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FEATURE DATA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const WORKSTREAMS = [
+  {
+    id: 'acquisition',
+    icon: '🔍',
+    title: 'Creator Acquisition',
+    subtitle: 'Finding and contacting creators at scale',
+    isNew: false,
+    features: [
+      {
+        id: 'creator-discovery',
+        title: 'Creator Discovery',
+        shortDesc: 'Automated search + filtering across TikTok, Instagram.',
+        fullDesc: 'Automated search and filtering across TikTok and Instagram. Build segmented lists by niche, engagement rate, and location for targeted outreach at scale. Foundation of the entire creator pipeline — everything downstream depends on this working cheaply and reliably.',
+        defaultStatus: 'live',
+        defaultTier: 'mlp',
+        sub: [
+          'TikTok creator search + filtering',
+          'Instagram creator search + filtering',
+          'Filter by niche, engagement rate, follower count, location',
+          'Build and export segmented creator lists',
+          'Per-platform scraping pipelines'
+        ],
+        deps: [
+          'Relies on expensive scraping infrastructure — significant ongoing cost driver',
+          'Each platform has its own separate scraping dependency chain',
+          'Scraping Cost Optimization (Internal Infra) needed for sustainable unit economics'
+        ],
+        oq: [
+          'How to make scraping cheaper beyond just passing the cost to the customer?',
+          'What is the current cost per 1,000 profiles scraped — is it sustainable at scale?'
+        ],
+        notes: []
+      },
+      {
+        id: 'dm-outreach',
+        title: 'DM Outreach',
+        shortDesc: 'Automated DM sequences with reply tracking and follow-ups.',
+        fullDesc: 'Automated DM sequences sent at scale with reply tracking, follow-up scheduling, and conversion tracking. Primary channel for converting discovered creators into active pipeline candidates. Currently running 112 DMs/week at DietFit — live proof of concept.',
+        defaultStatus: 'live',
+        defaultTier: 'mlp',
+        sub: [
+          'Multi-step automated DM sequences',
+          'Reply detection and real-time tracking',
+          'Follow-up scheduling (time-based and behavior-triggered)',
+          'Conversion tracking: DM sent → replied → onboarded',
+          'Instagram DM automation (fully tested and operational)',
+          'Per-platform expansion (other platforms not yet automated)'
+        ],
+        deps: [
+          'Instagram DM automation: tested and working today',
+          'TikTok, YouTube, Lemon8, X: not yet automated',
+          'Reply tracking depends on per-platform API access and rate limits'
+        ],
+        oq: [
+          'Scale non-Instagram platforms on-demand, or fake-it-till-justified with manual fallback?',
+          'Platform DM volume limits before accounts get flagged — what are safe ceilings?'
+        ],
+        notes: [
+          'Currently doing 112 DMs/week at DietFit — this validates the whole approach'
+        ]
+      },
+      {
+        id: 'branded-landing-pages',
+        title: 'Branded Landing Pages',
+        shortDesc: 'Per-brand creator recruitment pages at brand.pynchhq.com.',
+        fullDesc: 'Per-brand creator recruitment pages at brand.pynchhq.com. Creators land here from DM outreach and apply. The landing page is just the visible surface — the real build is the entire backend system (creator DB, dashboard, file management, email triggers).',
+        defaultStatus: 'live',
+        defaultTier: 'mlp',
+        sub: [
+          'Brand-specific landing page (front end) — this is the "live" part today',
+          'Creator application form and backend database',
+          'Creator dashboard: receive briefs, submit videos, communicate',
+          'File management system (video upload/download)',
+          'Google Drive integration (TBD)',
+          'Email triggers and automated notifications'
+        ],
+        deps: [
+          'Connected to Onboarding Flow — should be scoped together',
+          'Requires Creator Backend infrastructure to function end-to-end',
+          'File management decision (Google Drive vs. custom) blocks content collection'
+        ],
+        oq: [
+          'How much of the backend is actually built vs. the landing page being a placeholder?',
+          'Google Drive integration: yes/no? What does current file handling look like?'
+        ],
+        notes: [
+          'This is actually a SYSTEM, not a single feature — scope is much larger than it appears',
+          'The landing page exists — the backend system behind it is the real build'
+        ]
+      },
+      {
+        id: 'multi-platform-sourcing',
+        title: 'Multi-Platform Sourcing',
+        shortDesc: 'Expand beyond TikTok/IG to YouTube Shorts, X, Lemon8.',
+        fullDesc: 'Expand creator discovery and outreach to YouTube Shorts, X, and Lemon8. Build unified creator profiles that aggregate performance data across all active platforms.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'YouTube Shorts creator discovery',
+          'X (Twitter) creator search and outreach',
+          'Lemon8 integration',
+          'Unified cross-platform creator profiles',
+          'Platform-to-platform performance comparison'
+        ],
+        deps: [
+          'Each new platform needs its own scraping or API integration — high effort per platform',
+          'Unified profile schema must be designed before per-platform expansion',
+          'Creator Discovery core must be stable and cost-optimized before expanding'
+        ],
+        oq: [
+          'What is the exact current status of non-Instagram scraping — what does Khoa have partially built?',
+          'Which platform after Instagram has most demand from existing brand customers?'
+        ],
+        notes: []
+      },
+      {
+        id: 'inbound-applications',
+        title: 'Inbound Creator Applications',
+        shortDesc: 'Creators find brands through Pynch. Marketplace flip.',
+        fullDesc: 'Long-term vision: creators actively seek out brands through Pynch, flipping from purely outbound cold DMs to an inbound marketplace. This is where real platform defensibility and moat lives.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Creator-facing brand and campaign discovery',
+          'Creator application flow to brand campaigns',
+          'Brand-side applicant review and selection UI',
+          'Marketplace matching algorithm'
+        ],
+        deps: [
+          'Requires significant Creator Portal to be built and adopted first',
+          'Needs critical mass of both brands and creators',
+          'Creator Portfolio PLG would be the natural entry point'
+        ],
+        oq: [
+          'Is this the right long-term model, or does Pynch stay purely outbound-focused?',
+          'When does marketplace flywheel investment make sense at current stage?'
+        ],
+        notes: [
+          'Confirmed super far future — but worth keeping on the map',
+          'Real platform moat comes when creators are actively choosing Pynch to get discovered by brands'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'onboarding',
+    icon: '🤝',
+    title: 'Creator Onboarding & Management',
+    subtitle: 'From "interested" to actively producing',
+    isNew: false,
+    features: [
+      {
+        id: 'onboarding-flow',
+        title: 'Onboarding Flow',
+        shortDesc: 'Creator signs up → profile → agrees to terms → gets first brief.',
+        fullDesc: 'Automated onboarding: creator signs up, completes profile, agrees to terms, receives first brief. No manual brand touchpoints required. Tightly interconnected with Branded Landing Pages — scope these together to avoid overload.',
+        defaultStatus: 'building',
+        defaultTier: 'mlp',
+        sub: [
+          'Creator sign-up and account creation',
+          'Profile completion flow',
+          'Terms and agreements (click-to-agree)',
+          'First brief delivery trigger',
+          'Welcome email sequence',
+          'Onboarding status tracking for brand side'
+        ],
+        deps: [
+          'Depends on Branded Landing Pages backend being built',
+          'Requires Creator Profiles schema to be defined first',
+          'Brief Builder must be operational to deliver first brief'
+        ],
+        oq: [
+          'Should onboarding be part of the Landing Pages system or a separate module?',
+          'Minimum required profile fields before a creator can receive a brief?'
+        ],
+        notes: [
+          'Tightly interconnected with Branded Landing Pages — build together to avoid scope overload'
+        ]
+      },
+      {
+        id: 'creator-profiles',
+        title: 'Creator Profiles',
+        shortDesc: 'Niche, content style, platform stats, past work, rate card.',
+        fullDesc: 'Rich creator profiles: niche tags, content style, platform stats, past work, rate cards. Needs a Clay-style enrichment step to go beyond self-reported data — but enrichment is expensive and needs a pricing model.',
+        defaultStatus: 'planned',
+        defaultTier: 'mlp',
+        sub: [
+          'Self-reported fields (niche, style, rates, availability)',
+          'Platform stats auto-pull (followers, engagement rate)',
+          'Past work portfolio section',
+          'Rate card and availability status',
+          'Clay-style enrichment layer (scrape + verify deeper data)',
+          'Enrichment tier gating (basic free, deep enrichment premium/token-based)'
+        ],
+        deps: [
+          'Basic profile fields: needed for Onboarding Flow to complete',
+          'Enrichment layer: expensive, depends on Scraping Cost Optimization work',
+          'Platform stats pull: separate integration per platform'
+        ],
+        oq: [
+          'How to price/gate the enrichment step — brand pays per lookup, token-based, or subscription tier?',
+          'What is the minimum viable profile for MVP vs. richer data later?'
+        ],
+        notes: []
+      },
+      {
+        id: 'creator-vetting',
+        title: 'Creator Vetting / Scoring',
+        shortDesc: 'Auto-score creators on quality, consistency, reply rates.',
+        fullDesc: 'Automated scoring for engagement quality, content consistency, and reply rates. Filter out flakes early. The key insight: a reliable 8/10 creator who responds fast may be more valuable than a 10/10 who is slow and difficult. Brand decides the weighting.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'Engagement quality scoring (not just vanity metrics)',
+          'Content consistency scoring over time',
+          'Reply rate and turnaround time tracking',
+          '"Replies within 24 hours" reliability badge (Mercari-style)',
+          'Creator reliability score (behavioral signals)',
+          'Brand-configurable scoring weights (programmatic or manual)'
+        ],
+        deps: [
+          'Creator Profiles must be built first to have data to score against',
+          'Analytics Infrastructure (Internal Infra) needed for scoring at scale',
+          'Behavioral data accumulates over time — scoring improves with usage'
+        ],
+        oq: [
+          'What scoring signals matter most to brand customers — which drive the best ROI?',
+          'Should brands configure scoring weights themselves or use Pynch defaults?'
+        ],
+        notes: [
+          '"Replies within 24h" badge concept: like Mercari/marketplace reliability indicators',
+          'Creator reliability score: easy-to-work-with may rank higher than high-performer-but-slow'
+        ]
+      },
+      {
+        id: 'creator-coaching',
+        title: 'Creator Coaching',
+        shortDesc: 'Training flows: better UGC, brief-reading skills, brand expectations.',
+        fullDesc: 'Training and coaching flows for creators: how to shoot better UGC, understand what brands want, read briefs effectively, and improve over time. Confirmed really important but needs design thinking on how to actually deliver it at scale.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'UGC shooting technique guides',
+          'Brief comprehension and checklist flows',
+          'Brand expectation setting content',
+          'Progressive coaching based on past performance gaps',
+          'Creator skill level tracking'
+        ],
+        deps: [
+          'Creator Vetting/Scoring data feeds into what coaching to show each creator',
+          'Requires content creation and ongoing maintenance — not just a build',
+          'Creator Portal infrastructure needed to deliver coaching content'
+        ],
+        oq: [
+          'How to deliver this effectively at scale without it becoming a content maintenance burden?',
+          'Video guides vs. interactive checklists vs. AI-powered coaching — which format actually works?'
+        ],
+        notes: [
+          'Confirmed really important — directly impacts content quality and re-submission rates',
+          'Needs design thinking before building: the right delivery mechanism is not obvious'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'content',
+    icon: '🎬',
+    title: 'Content Pipeline',
+    subtitle: 'Brief → creation → collection → review → distribution',
+    isNew: false,
+    features: [
+      {
+        id: 'brief-builder',
+        title: 'Brief Builder',
+        shortDesc: 'Create and send content briefs with templates.',
+        fullDesc: 'Create and send content briefs with product info, creative direction, dos/don\'ts, and visual examples. Templatized for speed. Connected to Content Review for auto-screening submissions against the original brief.',
+        defaultStatus: 'building',
+        defaultTier: 'mlp',
+        sub: [
+          'Brief creation interface with structured fields',
+          'Template library (by product type, campaign type)',
+          'Product info, creative direction, dos/don\'ts, visual examples',
+          'Brief versioning (revisions without losing history)',
+          'Brief-to-creator assignment and delivery',
+          'Brief performance tracking (submission rate, revision rate per brief)'
+        ],
+        deps: [
+          'Connected to Content Review: briefs define the auto-screening criteria',
+          'Onboarding Flow triggers first brief delivery — these must integrate cleanly',
+          'Creator notification system needed to alert creators when a brief arrives'
+        ],
+        oq: [
+          'Who has write access to create briefs — only brand admins, or also brand team members?',
+          'How do brief revisions work after creators have already started submissions?'
+        ],
+        notes: []
+      },
+      {
+        id: 'content-collection',
+        title: 'Content Collection',
+        shortDesc: 'Creators submit videos/photos, tracked per brief.',
+        fullDesc: 'Creators submit videos and photos tracked per brief. The key insight: creators need VISIBILITY into the process. Status must feel human, not cold. Creator needs to feel the video doesn\'t go into a void.',
+        defaultStatus: 'planned',
+        defaultTier: 'mlp',
+        sub: [
+          'Creator-side submission interface (web + mobile)',
+          'File upload with progress indicator',
+          'Per-brief submission tracking and status',
+          'Status workflow: submitted → in review → approved / needs revision',
+          'Creator-facing status visibility (real-time, with timestamps)',
+          'Automated notifications at each status change'
+        ],
+        deps: [
+          'File storage decision: Google Drive integration vs. custom storage',
+          'Brief Builder must be live to attach submissions to briefs',
+          'Notification system needed for both creator and brand side'
+        ],
+        oq: [
+          'What file size limits are acceptable? How many concurrent uploads will the infra support?',
+          'What does the submission flow look like on mobile — creators often shoot and submit from their phone?'
+        ],
+        notes: [
+          'Status workflow must feel human and not cold — time-gated without feeling impersonal',
+          'Creator needs to feel secure the video doesn\'t disappear into a void',
+          'Good relationship with the platform depends on this being done right'
+        ]
+      },
+      {
+        id: 'content-review',
+        title: 'Content Review Workflow',
+        shortDesc: 'Approve, reject, or request revisions with warm feedback.',
+        fullDesc: 'Brand reviews content submissions. Approve, request revision (with templated or custom feedback), or reject. Auto-screening against brief criteria as the first gate — human review only for flagged or borderline content.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'Brand-side review queue and batch review UI',
+          'Approve / request revision / reject actions',
+          'Revision feedback templates (warm and friendly by default)',
+          'Auto-screening gate: basic brief compliance check before human review',
+          'Review assignment to brand team members',
+          'SLA tracking: time from submission to review decision'
+        ],
+        deps: [
+          'Connected to Brief Builder: brief criteria define auto-screening rules',
+          'AI Content QA feeds into auto-screening layer',
+          'Content Collection must be live first'
+        ],
+        oq: [
+          'What is the right default tone for revision requests — how warm/friendly should the auto-language be?',
+          'What counts as "auto-pass" vs. requires human review at MVP?'
+        ],
+        notes: [
+          'If video doesn\'t pass auto-screening, brand can send feedback automatically in a warm/friendly way',
+          'Flow: brief → submit → auto-screen → human review → approve / revision'
+        ]
+      },
+      {
+        id: 'ai-content-qa',
+        title: 'AI Content QA',
+        shortDesc: 'Auto-check tech specs, brand compliance, brief alignment.',
+        fullDesc: 'Auto-check submissions for technical specs (resolution, orientation, length), brand compliance, and brief alignment. Simple scoring for MVP: watch creator output against brief basics. Already have a Gemini gem doing something similar — evaluate before rebuilding.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Technical specs check (resolution, aspect ratio, duration)',
+          'Brand compliance scanning (brand assets visible, competitor products absent)',
+          'Brief alignment scoring',
+          'Simple pass/fail or flagged/unflagged output for human review queue',
+          'Confidence score (how certain is the AI about its assessment)'
+        ],
+        deps: [
+          'Content Review Workflow must exist for AI QA to feed into',
+          'Brief Builder schema needs to be machine-readable for auto-screening rules',
+          'Existing Gemini gem: evaluate and potentially extend rather than rebuild'
+        ],
+        oq: [
+          'Can a simple version genuinely add value in MVP, or does it create more noise than signal?',
+          'What is the false positive rate on brief alignment scoring — does it save review time or add disputes?'
+        ],
+        notes: [
+          'Already had a Gemini gem doing something similar — evaluate before building from scratch',
+          'Try simple version for MVP: if it reduces review time by 30%+ it earns its keep'
+        ]
+      },
+      {
+        id: 'content-library',
+        title: 'Content Library',
+        shortDesc: 'All approved content in one place, searchable.',
+        fullDesc: 'All approved content in one place, searchable by creator, campaign, product, and performance. The brand\'s UGC asset library. Connected to Post-Approval Distribution for scheduling and performance monitoring.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Content grid/list view with filters',
+          'Search by creator, campaign, product, date, performance',
+          'Tag and categorize approved content',
+          'Direct link to Post-Approval Distribution for scheduling',
+          'Usage rights tracking (where has each piece been used?)'
+        ],
+        deps: [
+          'Content Review Workflow must be live — library only holds approved content',
+          'Post-Approval Distribution connects directly to library',
+          'Performance data from distributed content feeds back into library metadata'
+        ],
+        oq: [
+          'What is the right UGC library UX — grid like stock photo sites, or more like a campaign-centric view?',
+          'Should usage rights and contract terms be surfaced inline in the library?'
+        ],
+        notes: []
+      },
+      {
+        id: 'post-approval-distribution',
+        title: 'Post-Approval Distribution',
+        shortDesc: 'Schedule approved UGC, monitor performance, flag winning content.',
+        fullDesc: 'NEW: Social scheduling from the dashboard — brand connects accounts, schedules approved UGC, monitors performance, and identifies winners to boost as ads. This closes the full flywheel: source → create → post → measure → boost winners.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Brand social account connection (Instagram, TikTok, YouTube)',
+          'Scheduling approved UGC from content library',
+          'Post-publish performance monitoring (views, engagement, saves)',
+          'Winner identification: flag organically performing content for ad spend',
+          '"Invest in this" signal: high organic = prioritize for paid boosting',
+          'ROI loop: track boosted content performance vs. organic baseline'
+        ],
+        deps: [
+          'Content Library must exist first — this is the scheduling layer on top',
+          'Performance data requires Analytics Infrastructure (Internal Infra)',
+          'Platform API connections (Instagram Graph API, TikTok for Business, etc.)'
+        ],
+        oq: [
+          'Is this in-product scheduling or integration with existing tools (Later, Buffer, Hootsuite)?',
+          'Who owns the brand social accounts — does Pynch need to hold credentials? Security implications.'
+        ],
+        notes: [
+          'NEW feature from Neel/Khoa discussion — not in original feature map',
+          'Closes the flywheel: source → create → post → measure → boost winners',
+          'The winner identification piece is the most differentiated part of this'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'dashboard',
+    icon: '📊',
+    title: 'Brand Dashboard',
+    subtitle: "The brand's command center",
+    isNew: false,
+    features: [
+      {
+        id: 'creator-farm-view',
+        title: 'Creator Farm View',
+        shortDesc: 'See all creators, filter by status/niche/quality. Built for scale.',
+        fullDesc: 'See all creators in one place — filter by status, niche, output quality, and reliability score. Must be built for scale from day one: hundreds to thousands of creators per brand. The "Farm" view is Farm Mode\'s north star. Name TBD.',
+        defaultStatus: 'planned',
+        defaultTier: 'mlp',
+        sub: [
+          'Creator grid/table view with key metrics',
+          'Filter by status (active, on brief, paused, churned)',
+          'Filter by niche, quality score, reliability score, platform',
+          'Sort by output rate, cost per video, engagement performance',
+          'Bulk actions (brief multiple creators, pause, archive)',
+          'Pagination/virtualization for 1,000+ creator lists'
+        ],
+        deps: [
+          'Creator Profiles schema must be defined first',
+          'Creator Vetting/Scoring needed to populate quality and reliability scores',
+          'Analytics Infrastructure needed for performance data at scale'
+        ],
+        oq: [
+          '"Creator Farm" — is the name right, or does it have negative connotations for some brands?',
+          'What are the must-have filters for MVP vs. nice-to-have filters for v2?'
+        ],
+        notes: [
+          'Must be built for SCALE from the start — not retrofitted later',
+          'This view should make the sheer volume of automation visible and satisfying'
+        ]
+      },
+      {
+        id: 'pipeline-dashboard',
+        title: 'Pipeline Dashboard',
+        shortDesc: 'Outreach → Replied → Onboarded → Briefed → Delivered.',
+        fullDesc: 'Full-funnel pipeline view: Outreach → Replied → Onboarded → Briefed → Delivered. See where every creator is in the funnel in real time. This is the WOW FACTOR — it visualizes the sheer volume of automated work and sells the product during demos.',
+        defaultStatus: 'planned',
+        defaultTier: 'mlp',
+        sub: [
+          'Kanban or funnel view of all creator pipeline stages',
+          'Real-time counts at each stage',
+          'Stage-specific actions (follow up, move, pause)',
+          'Conversion rate between stages',
+          'Time-in-stage metrics (how long does average creator sit at each stage?)',
+          'Bottleneck identification (where are creators getting stuck?)'
+        ],
+        deps: [
+          'All upstream systems must be writing events to a shared state store',
+          'Analytics Infrastructure for real-time counts and conversion rates',
+          'DM Outreach, Onboarding, Brief Builder all feed into this view'
+        ],
+        oq: [
+          'Kanban style vs. funnel visualization — which reads better for a busy brand manager?',
+          'Should this show absolute numbers or percentage-through-funnel by default?'
+        ],
+        notes: [
+          'THE WOW FACTOR. The product sells itself through this view during demos.',
+          'Must visualize the volume of automated work — that\'s the entire value proposition made visible'
+        ]
+      },
+      {
+        id: 'performance-tracking',
+        title: 'Performance Tracking',
+        shortDesc: 'CPV, CPI, ROAS, campaign rollups, creator reliability.',
+        fullDesc: 'Per-creator and per-campaign performance metrics: CPV, CPI, ROAS (if content is boosted as an ad), submission speed, re-submission rate, and brief accuracy over time. Brand decides the weighting. Completely greenfield — no analytics infra exists today.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'Per-creator: CPV, CPI, ROAS, engagement rate on delivered content',
+          'Campaign rollups: total spend, total videos, cost per approved video',
+          'Operational health: submission speed, re-submission rate, brief accuracy over time',
+          'Creator reliability score (easy-to-work-with vs. high-performer)',
+          'Configurable brand-side metric weighting',
+          'Historical trend charts per creator and per campaign'
+        ],
+        deps: [
+          'Analytics Infrastructure (Internal Infra) is the prerequisite — completely greenfield',
+          'Post-Approval Distribution needed for ROAS data on boosted content',
+          'Creator Vetting/Scoring feeds into reliability dimensions'
+        ],
+        oq: [
+          'What are the right UGC campaign metrics — what do brand customers actually care about most?',
+          'Should brands configure metric weights themselves, or should Pynch recommend defaults?',
+          'How do we get ROAS data if brand is boosting content outside of Pynch?'
+        ],
+        notes: [
+          'Completely greenfield — no analytics infra exists today',
+          'Needs customer research before building: what do brand customers actually track today?'
+        ]
+      },
+      {
+        id: 'campaign-mode',
+        title: 'Campaign Mode',
+        shortDesc: 'Higher-value, lower-volume campaigns. Different creator tier.',
+        fullDesc: 'A different mode and creator tier from Farm Mode. Campaign Mode is about buying audience, not just buying content. Higher value, lower volume. $50/video commodity creators are not the target here — these are purpose-built activation campaigns.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Separate campaign creation flow (not brief-based)',
+          'Higher-tier creator selection (different criteria, different pricing)',
+          'Campaign timeline and milestone tracking',
+          'Audience-reach metrics (not just content volume)',
+          'Campaign wrap report and ROI summary'
+        ],
+        deps: [
+          'Farm Mode and pipeline dashboard must be stable before building Campaign Mode',
+          'Separate UX design sprint required — cannot reuse Farm Mode patterns directly',
+          'Creator Profiles need campaign-tier metadata (audience size, content quality tier)'
+        ],
+        oq: [
+          'Is Campaign Mode a different product, or a different mode within the same dashboard?',
+          'Who is the buyer for Campaign Mode vs. Farm Mode — same person or different stakeholder?'
+        ],
+        notes: [
+          'About buying AUDIENCE, not buying content — fundamentally different value prop',
+          'Needs its own UX design pass separate from Farm Mode',
+          '$50/video creators are NOT the target for Campaign Mode'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'portal',
+    icon: '🎨',
+    title: 'Creator Portal',
+    subtitle: 'The creator-facing experience, branded per customer',
+    isNew: false,
+    features: [
+      {
+        id: 'branded-creator-hub',
+        title: 'Branded Creator Hub',
+        shortDesc: 'White-label portal per brand. Briefs, submissions, payments.',
+        fullDesc: 'White-label portal per brand at brand.pynchhq.com/portal. Creator logs in, sees their briefs, submits content, tracks payments, and communicates. Not MVP but immediately after — DietFit team is already drowning in creator questions. This solves that pain directly.',
+        defaultStatus: 'idea',
+        defaultTier: 'mlp',
+        sub: [
+          'Brand-scoped creator login',
+          'Brief inbox for active and completed briefs',
+          'Content submission UI (integrated with Content Collection)',
+          'Payment status view (what\'s pending, what\'s been paid)',
+          'Messaging / support channel with brand',
+          'Notification preferences'
+        ],
+        deps: [
+          'Branded Landing Pages backend infrastructure is the foundation for this',
+          'Content Collection must be live for submission functionality',
+          'Mass Payments must be live for creator payment visibility',
+          'Brief Builder delivers briefs to creator inbox here'
+        ],
+        oq: [
+          'Full portal with all features, or start with just brief delivery + submission?',
+          'How much brand customization does the portal support at launch (logo, colors, domain)?'
+        ],
+        notes: [
+          'Not MVP but "immediately after" — MLP territory',
+          'DietFit team is already drowning in creator questions about process, payments, video status',
+          'A portal directly solves that pain — this is a support cost reduction, not just a nice-to-have'
+        ]
+      },
+      {
+        id: 'creator-earnings',
+        title: 'Creator Earnings Dashboard',
+        shortDesc: 'Pending payments, payment history, upcoming briefs.',
+        fullDesc: 'Creators see pending payments, payment history, cost-per-video breakdown, and upcoming briefs all in one place. Transparency builds creator retention and reduces inbound support volume significantly.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Pending payment amounts and expected dates',
+          'Payment history with per-video breakdown',
+          'Upcoming brief pipeline (what\'s coming next)',
+          'Lifetime earnings summary',
+          'Payment dispute or question flow'
+        ],
+        deps: [
+          'Branded Creator Hub must be built first (this lives inside it)',
+          'Mass Payments and Payment Tracking must be live and accurate',
+          'Brief Builder feeds the "upcoming" section'
+        ],
+        oq: [
+          'What level of payment detail should creators see — just totals, or line-item per video?',
+          'How do we handle payments in different currencies (VND, IDR, PHP) in the display?'
+        ],
+        notes: [
+          'Transparency builds creator retention — reduces "where is my money?" support volume'
+        ]
+      },
+      {
+        id: 'creator-portfolio',
+        title: 'Creator Portfolio & PLG Play',
+        shortDesc: 'Public portfolio with live data. THE growth flywheel feature.',
+        fullDesc: 'Public-facing creator profile with best work, live platform data, and Pynch branding. THE PLG GROWTH PLAY: creator signs up free, Pynch builds their portfolio, creator shares it to brands, every portfolio = Pynch ad, creator earns affiliate kickback when brands sign up. This is creator-led brand acquisition.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Public creator profile page (pynch.com/@handle or brand.pynchhq.com/@handle)',
+          'Auto-built portfolio from platform data (Pynch scrapes, creator just shares)',
+          'Live-updating stats (follower count, engagement rate, recent posts)',
+          'Pynch branding on every page ("Built with Pynch")',
+          'Creator affiliate link embedded in portfolio',
+          'Brand sign-up trigger when brand clicks through to learn more',
+          'Affiliate kickback when brand converts through creator\'s portfolio'
+        ],
+        deps: [
+          'Creator Profiles data is the foundation',
+          'Scraping infrastructure to auto-pull platform stats',
+          'Affiliate tracking system needed for kickback mechanism',
+          'Landing page / brand sign-up flow for the conversion step'
+        ],
+        oq: [
+          'Should this be a separate free product, or a feature within Creator Portal?',
+          'When to build: before or after Creator Portal has meaningful adoption?',
+          'What is the affiliate kickback structure — % of first year contract, flat fee, other?'
+        ],
+        notes: [
+          'NEW from Neel/Khoa discussion — huge PLG opportunity',
+          'THE PLG GROWTH PLAY: creator-led acquisition for the brand side',
+          'Better than Canva portfolio because it\'s real data, live-updating, zero creator effort',
+          'Every portfolio page = Pynch ad to every brand who sees it',
+          'Step 1: Creator signs up free → gets portfolio. Step 2: Shares it. Step 3: Brand discovers Pynch.',
+          'Creators incentivized to actively sell Pynch to brands via affiliate kickback'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'payments',
+    icon: '💰',
+    title: 'Payments & Operations',
+    subtitle: 'Money, contracts, and the boring stuff that kills you if wrong',
+    isNew: false,
+    features: [
+      {
+        id: 'mass-payments',
+        title: 'Mass Payments',
+        shortDesc: 'Pay 50+ creators in one batch. Multi-currency.',
+        fullDesc: 'Pay 50+ creators in a single batch operation. USD first, multi-currency later. Must account for non-US creators taking USD (FX fees) and who bears those fees. This must be configurable by the brand.',
+        defaultStatus: 'building',
+        defaultTier: 'mlp',
+        sub: [
+          'Batch payment creation and execution',
+          'Per-creator payment tracking and status',
+          'USD support (day one)',
+          'Multi-currency support: VND, IDR, PHP, etc. (later)',
+          'Fee allocation config: who pays FX fees — brand or creator?',
+          'Payment confirmation and receipt generation',
+          'Failed payment handling and retry'
+        ],
+        deps: [
+          'Payment provider selection: must be decided before building (buy vs. build)',
+          'Creator banking info collection during onboarding',
+          'Content approval gate: payments should only trigger post-approval'
+        ],
+        oq: [
+          'Buy vs. build: evaluate Deel, Tipalti, Routable before building in-house',
+          'Who is legally liable for payments — Pynch, or is this a pass-through to the brand?',
+          'FX fee structure: flat %, pass-through, or Pynch absorbs?'
+        ],
+        notes: [
+          'USD first, multi-currency later',
+          'FX fee allocation must be configurable — not hardcoded to one model'
+        ]
+      },
+      {
+        id: 'payment-tracking',
+        title: 'Payment Tracking',
+        shortDesc: 'Per-creator history, cost per video, budget tracking.',
+        fullDesc: 'Per-creator payment history, cost-per-video analysis, and campaign budget tracking. Brands need to know their total UGC spend and cost efficiency at a glance.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'Per-creator payment history',
+          'Cost per video (approved vs. attempted)',
+          'Budget allocation and tracking per campaign',
+          'Total spend dashboard with date range filters',
+          'Payment schedule view (upcoming batches)'
+        ],
+        deps: [
+          'Mass Payments must be live and writing payment records',
+          'Content approval data needed for cost-per-approved-video calculation',
+          'Analytics Infrastructure for aggregated spend reporting'
+        ],
+        oq: [
+          'Should budget limits be hard caps (stop outreach when budget hit) or soft warnings?',
+          'Do brands need multi-currency reporting or just USD equivalent?'
+        ],
+        notes: []
+      },
+      {
+        id: 'contracts',
+        title: 'Contracts & Agreements',
+        shortDesc: 'Auto-generated terms for standard creators. Bespoke for high-value.',
+        fullDesc: 'Auto-generated creator agreements for standard $50/video creators (already have click-to-agree). Bespoke contracts only for high-value campaign creators. Don\'t over-engineer this: most creators don\'t need complex agreements.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Click-to-agree standard terms (already have this)',
+          'Usage rights clauses (standard)',
+          'Bespoke contract workflow for high-value campaign creators',
+          'Contract version management',
+          'E-signature integration for bespoke contracts'
+        ],
+        deps: [
+          'Onboarding Flow already includes click-to-agree — this is an extension, not from scratch',
+          'Campaign Mode (when built) will drive demand for bespoke contracts'
+        ],
+        oq: [
+          'Who drafts the bespoke contracts — Pynch templates, or brand uploads their own?',
+          'What e-signature tool (DocuSign, HelloSign, native) makes sense at scale?'
+        ],
+        notes: [
+          'Auto-generated terms fine for $50/video creators — already have click-to-agree',
+          'Bespoke contracts only for high-value campaign creators',
+          'Don\'t over-engineer — most creators don\'t need complex agreements'
+        ]
+      },
+      {
+        id: 'invoice-generation',
+        title: 'Invoice Generation',
+        shortDesc: 'Auto-generate invoices. Three money flow models to decide between.',
+        fullDesc: 'Auto-generate invoices for brands tied to delivered content. The tricky part: three possible money flow models, each with different risk and compliance implications.',
+        defaultStatus: 'idea',
+        defaultTier: 'future',
+        sub: [
+          'Auto-generated brand invoices tied to approved content',
+          'Model A: Brand pays Pynch, Pynch pays creators (float + risk)',
+          'Model B: Back-to-back invoicing (risk in managing money)',
+          'Model C: PSP in the middle — most likely for now',
+          'Invoice PDF generation and delivery',
+          'Invoice reconciliation against payment records'
+        ],
+        deps: [
+          'Payment flow model decision must happen before building',
+          'Mass Payments must be live — invoices reconcile against payment records',
+          'EU regulatory compliance check needed (especially for Model A)'
+        ],
+        oq: [
+          'Which of the three payment flow models: Pynch holds funds, PSP in middle, or back-to-back?',
+          'Buy vs. build for payments infra entirely? (Platforms exist that just do this.)',
+          'EU compliance: does holding creator funds trigger e-money regulations?'
+        ],
+        notes: [
+          'Three money flow models — decision needed before architecture locks in',
+          'Buy vs. build: platforms exist that handle this end-to-end (Deel, Tipalti, Routable)'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'infra',
+    icon: '🔧',
+    title: 'Internal Infrastructure',
+    subtitle: 'The hidden layer everything else depends on',
+    isNew: true,
+    features: [
+      {
+        id: 'analytics-infra',
+        title: 'Analytics Infrastructure',
+        shortDesc: 'Completely greenfield. Required for everything data-driven.',
+        fullDesc: 'No analytics infrastructure exists today — completely greenfield. Required for performance tracking, creator scoring, pipeline dashboards, and every data-driven feature in the product. This is a prerequisite, not a feature.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'Event tracking system (user actions, creator actions, content events)',
+          'Data warehouse or analytics store (Postgres + aggregations, or separate)',
+          'Real-time pipeline counts (for Pipeline Dashboard)',
+          'Creator scoring data pipeline',
+          'Campaign performance aggregation',
+          'Reporting query layer'
+        ],
+        deps: [
+          'This is a prerequisite for: Performance Tracking, Creator Vetting/Scoring, Pipeline Dashboard, Post-Approval Distribution, Payment Tracking',
+          'Architecture decision needed: event store approach (Kafka, Postgres events, etc.)',
+          'Needs scoping before any data-dependent features are committed to timelines'
+        ],
+        oq: [
+          'What is the simplest analytics infra that unblocks MVP data needs?',
+          'Does Khoa have any event tracking or data pipelines today, or truly zero?',
+          'Third-party (Amplitude, Mixpanel, PostHog) vs. custom build vs. lightweight Postgres approach?'
+        ],
+        notes: [
+          'NEW workstream from Neel/Khoa discussion',
+          'Completely greenfield — no analytics infra exists today',
+          'Needed for performance tracking, scoring, everything data-driven',
+          'This is infrastructure, not a product feature — but it unlocks huge product value'
+        ]
+      },
+      {
+        id: 'scraping-cost-optimization',
+        title: 'Scraping Cost Optimization',
+        shortDesc: 'Creator discovery relies on expensive scraping. Must fix unit economics.',
+        fullDesc: 'Creator discovery relies on expensive third-party scraping services. At scale, this becomes a significant unit economics problem. Need to optimize costs, find cheaper approaches, or build a sustainable cost model.',
+        defaultStatus: 'planned',
+        defaultTier: 'future',
+        sub: [
+          'Audit current scraping cost per 1,000 profiles',
+          'Caching layer: don\'t re-scrape profiles that haven\'t changed',
+          'Tiered scraping: cheap basic pass first, expensive enrichment only when needed',
+          'Rate limiting and batching to reduce per-request costs',
+          'Evaluate alternative scraping providers or in-house solution',
+          'Customer cost-pass-through pricing model if costs can\'t be reduced'
+        ],
+        deps: [
+          'Creator Discovery depends on this — scale is blocked without cost optimization',
+          'Creator Profiles enrichment layer same issue',
+          'Affects pricing model: if scraping is expensive, it impacts per-seat pricing assumptions'
+        ],
+        oq: [
+          'What is the actual current cost per 1,000 profiles — where does this need to get to for margin health?',
+          'Is there a scraping provider with better economics than current setup?',
+          'How much of scraping cost can be legitimately passed to customers as a "data enrichment" feature?'
+        ],
+        notes: [
+          'NEW workstream from Neel/Khoa discussion',
+          'Scraping cost is a real unit economics risk if not addressed before scale',
+          'Caching + tiered approach is probably the fastest win before evaluating provider alternatives'
+        ]
+      }
+    ]
+  }
+];
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STATE MANAGEMENT — localStorage
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const LS_KEY = 'pynch-feature-map-v2';
+const STATUS_CYCLE = ['live', 'building', 'planned', 'idea'];
+const TIER_CYCLE = ['mvp', 'mlp', 'future'];
+const STATUS_LABELS = { live: 'Live', building: 'Building', planned: 'Planned', idea: 'Idea' };
+const TIER_LABELS = { mvp: 'MVP', mlp: 'MLP', future: 'Future' };
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveState(state) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+const state = loadState();
+
+function getCardStatus(id, def) {
+  return (state[id] && state[id].status) || def;
+}
+
+function getCardTier(id, def) {
+  return (state[id] && state[id].tier) || def;
+}
+
+function setCardStatus(id, status) {
+  if (!state[id]) state[id] = {};
+  state[id].status = status;
+  saveState(state);
+}
+
+function setCardTier(id, tier) {
+  if (!state[id]) state[id] = {};
+  state[id].tier = tier;
+  saveState(state);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RENDER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderList(items, sectionClass) {
+  if (!items || items.length === 0) return '';
+  return `<ul class="detail-list">${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+}
+
+function renderSection(title, items, sectionClass) {
+  if (!items || items.length === 0) return '';
+  return `
+    <div class="detail-section ${sectionClass}">
+      <div class="detail-section-title">${title}</div>
+      ${renderList(items, sectionClass)}
+    </div>
+  `;
+}
+
+function renderCard(feature, wsId) {
+  const status = getCardStatus(feature.id, feature.defaultStatus);
+  const tier = getCardTier(feature.id, feature.defaultTier);
+
+  const hasSub = feature.sub && feature.sub.length > 0;
+  const hasDeps = feature.deps && feature.deps.length > 0;
+  const hasOq = feature.oq && feature.oq.length > 0;
+  const hasNotes = feature.notes && feature.notes.length > 0;
+  const hasDetails = hasSub || hasDeps || hasOq || hasNotes;
+
+  return `
+    <div class="card ${status}" id="card-${feature.id}" data-id="${feature.id}" data-default-status="${feature.defaultStatus}" data-default-tier="${feature.defaultTier}">
+      <div class="card-header" onclick="toggleCard('${feature.id}')">
+        <div class="card-title">${feature.title}</div>
+        ${hasDetails ? '<div class="card-chevron">▼</div>' : ''}
+      </div>
+      <div class="card-desc" onclick="toggleCard('${feature.id}')">${feature.shortDesc}</div>
+      <div class="card-footer">
+        <span class="tier-badge ${tier}" onclick="cycleTier(event, '${feature.id}')" title="Click to change tier">${TIER_LABELS[tier]}</span>
+        <span class="status-tag" onclick="cycleStatus(event, '${feature.id}')" title="Click to change status">${STATUS_LABELS[status]}</span>
+      </div>
+      ${hasDetails ? `
+      <div class="card-details" id="details-${feature.id}">
+        <div class="card-details-inner">
+          <p class="detail-full-desc">${feature.fullDesc}</p>
+          <div class="detail-grid">
+            ${renderSection('Sub-features', feature.sub, 'section-sub')}
+            ${renderSection('Dependencies', feature.deps, 'section-dep')}
+            ${renderSection('Open Questions', feature.oq, 'section-oq')}
+            ${renderSection('Notes', feature.notes, 'section-notes')}
+          </div>
+        </div>
+      </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderWorkstream(ws) {
+  return `
+    <div class="swimlane" id="ws-${ws.id}">
+      <div class="swimlane-header">
+        <span class="swimlane-icon">${ws.icon}</span>
+        <span class="swimlane-title">${ws.title}</span>
+        <span class="swimlane-count">${ws.features.length}</span>
+        ${ws.isNew ? '<span class="swimlane-new">New</span>' : ''}
+        <span class="swimlane-subtitle">${ws.subtitle}</span>
+      </div>
+      <div class="cards">
+        ${ws.features.map(f => renderCard(f, ws.id)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  const board = document.getElementById('board');
+  board.innerHTML = WORKSTREAMS.map(renderWorkstream).join('');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INTERACTIONS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  const details = document.getElementById('details-' + id);
+  if (!details) return;
+
+  const isExpanded = card.classList.contains('expanded');
+
+  if (isExpanded) {
+    // Collapse
+    details.style.maxHeight = details.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        details.style.maxHeight = '0';
+      });
+    });
+    card.classList.remove('expanded');
+  } else {
+    // Expand
+    card.classList.add('expanded');
+    details.style.maxHeight = details.scrollHeight + 'px';
+    // After transition, set to none to allow dynamic content
+    details.addEventListener('transitionend', function handler() {
+      if (card.classList.contains('expanded')) {
+        details.style.maxHeight = 'none';
+      }
+      details.removeEventListener('transitionend', handler);
+    });
+  }
+}
+
+function cycleTier(event, id) {
+  event.stopPropagation();
+  const current = getCardTier(id, 'future');
+  const nextIndex = (TIER_CYCLE.indexOf(current) + 1) % TIER_CYCLE.length;
+  const next = TIER_CYCLE[nextIndex];
+  setCardTier(id, next);
+
+  // Update badge in DOM without full re-render
+  const badge = event.target;
+  badge.className = 'tier-badge ' + next;
+  badge.textContent = TIER_LABELS[next];
+}
+
+function cycleStatus(event, id) {
+  event.stopPropagation();
+  const card = document.getElementById('card-' + id);
+  const current = getCardStatus(id, card.dataset.defaultStatus);
+  const nextIndex = (STATUS_CYCLE.indexOf(current) + 1) % STATUS_CYCLE.length;
+  const next = STATUS_CYCLE[nextIndex];
+  setCardStatus(id, next);
+
+  // Update card class and status tag in DOM
+  STATUS_CYCLE.forEach(s => card.classList.remove(s));
+  card.classList.add(next);
+
+  const tag = event.target;
+  tag.textContent = STATUS_LABELS[next];
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
