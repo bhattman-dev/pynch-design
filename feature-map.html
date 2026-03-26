@@ -156,6 +156,27 @@
   }
   .status-tag:hover { transform: scale(1.05); }
 
+  /* Sub-feature tier count on collapsed card */
+  .sub-tier-summary {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .sub-tier-chip {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+    opacity: 0.75;
+  }
+  .sub-tier-chip.mvp    { background: rgba(255,77,90,0.15); color: #FF4D5A; }
+  .sub-tier-chip.mlp    { background: rgba(255,140,66,0.15); color: #FF8C42; }
+  .sub-tier-chip.future { background: rgba(40,40,55,0.8); color: #3a3a4a; border: 1px solid #2a2a3a; }
+  .sub-tier-chip-sep    { color: #2a2a3a; font-size: 9px; }
+
   /* Expanded content */
   .card-details {
     overflow: hidden;
@@ -172,7 +193,7 @@
   }
   .detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
   }
   .detail-section-title {
@@ -184,10 +205,60 @@
     font-size: 12px; color: #888; padding-left: 18px;
     position: relative; line-height: 1.45;
   }
-  .section-sub   .detail-list li::before { content: '◆'; position:absolute; left:0; font-size:6px; top:5px; color:#3a3a4a; }
   .section-dep   .detail-list li::before { content:'↗'; position:absolute; left:0; font-size:10px; top:1px; color:rgba(255,140,66,0.45); }
   .section-oq    .detail-list li::before { content:'?'; position:absolute; left:1px; font-size:10px; top:1px; color:#A78BFA; font-weight:800; opacity:0.7; }
   .section-notes .detail-list li::before { content:'→'; position:absolute; left:0; font-size:10px; top:1px; color:rgba(255,77,90,0.5); }
+
+  /* Sub-features as mini-card rows */
+  .section-sub-features {
+    grid-column: 1 / -1;
+    margin-bottom: 4px;
+  }
+  .sub-features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .sub-feature-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 7px;
+    padding: 7px 10px;
+    transition: background 0.15s ease;
+  }
+  .sub-feature-row:hover { background: rgba(255,255,255,0.04); }
+  .sub-feature-text {
+    font-size: 11.5px;
+    color: #888;
+    line-height: 1.4;
+    flex: 1;
+  }
+  .sub-feature-text::before {
+    content: '◆';
+    font-size: 5px;
+    color: #3a3a4a;
+    margin-right: 7px;
+    vertical-align: middle;
+  }
+  .sub-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 8px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    padding: 2px 6px; border-radius: 3px;
+    cursor: pointer; user-select: none;
+    white-space: nowrap; flex-shrink: 0;
+    transition: transform 0.1s ease, opacity 0.1s ease;
+  }
+  .sub-tier-badge:hover { transform: scale(1.08); opacity: 0.9; }
+  .sub-tier-badge.mvp    { background: #FF4D5A; color: #fff; }
+  .sub-tier-badge.mlp    { background: #FF8C42; color: #fff; }
+  .sub-tier-badge.future { background: #18181f; color: #3a3a4a; border: 1px solid #2a2a3a; }
 
   /* Open questions section */
   .oq-section {
@@ -234,12 +305,13 @@
 <div class="header">
   <h1>Pynch — Feature Map</h1>
   <p class="header-meta">
-    <strong>v2</strong> &middot; Updated 26 Mar 2026 &middot;
-    Source: Vision Doc v4 + Neel/Khoa sync &middot; 7 workstreams &middot; 24 features
+    <strong>v2.1</strong> &middot; Updated 26 Mar 2026 &middot;
+    Source: Vision Doc v4 + Neel/Khoa sync + Yukihama research &middot; 7 workstreams &middot; 24 features
   </p>
   <div class="header-hint">
-    <em>▼</em> Click card to expand full notes &nbsp;&middot;&nbsp;
-    <em>●</em> Tap tier + status badges to reassign &nbsp;&middot;&nbsp; saves in browser
+    <em>▼</em> Click card to expand &nbsp;&middot;&nbsp;
+    <em>●</em> Tap tier + status badges to reassign &nbsp;&middot;&nbsp;
+    <em>◆</em> Sub-features have their own tier badges &nbsp;&middot;&nbsp; all saves in browser
   </div>
 </div>
 
@@ -271,17 +343,18 @@
     <li>UGC campaign metrics: CPV, CPI, ROAS, submission speed, re-submission rate, brief accuracy. What actually matters most to brand customers? Needs customer research.</li>
     <li>Creator Portfolio as PLG: could be a standalone free product driving brand-side acquisition. Build before or after Creator Portal?</li>
     <li>AI Content QA: simple version for MVP (auto-screen against brief basics) or park entirely? Already have a Gemini gem doing something similar &mdash; evaluate before rebuilding.</li>
-    <li>Buy vs build for payments infra? Platforms like Deel, Tipalti, Routable already do mass creator payments. Evaluate before building.</li>
+    <li>Buy vs. build for payments infra? Platforms like Deel, Tipalti, Routable already do mass creator payments. Evaluate before building.</li>
   </ol>
 </div>
 
 <div class="page-footer">
-  Pynch internal tool &mdash; not for external sharing &nbsp;&middot;&nbsp; Toggle states persist in your browser localStorage
+  Pynch internal tool &mdash; not for external sharing &nbsp;&middot;&nbsp; Toggle states persist in your browser localStorage &nbsp;&middot;&nbsp; Tier presets from Yukihama research &mdash; adjust as needed
 </div>
 
 <script>
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // FEATURE DATA
+// Sub-features: {text, defaultTier} — tiers pre-set from Yukihama research
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const WORKSTREAMS = [
   {
@@ -297,13 +370,13 @@ const WORKSTREAMS = [
         shortDesc: 'Automated search + filtering across TikTok, Instagram.',
         fullDesc: 'Automated search and filtering across TikTok and Instagram. Build segmented lists by niche, engagement rate, and location for targeted outreach at scale. Foundation of the entire creator pipeline — everything downstream depends on this working cheaply and reliably.',
         defaultStatus: 'live',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'TikTok creator search + filtering',
-          'Instagram creator search + filtering',
-          'Filter by niche, engagement rate, follower count, location',
-          'Build and export segmented creator lists',
-          'Per-platform scraping pipelines'
+          { text: 'TikTok creator search + filtering', defaultTier: 'mvp' },
+          { text: 'Instagram creator search + filtering', defaultTier: 'mvp' },
+          { text: 'Filter by niche, engagement rate, follower count, location', defaultTier: 'mvp' },
+          { text: 'Build and export segmented creator lists', defaultTier: 'mlp' },
+          { text: 'Per-platform scraping pipelines', defaultTier: 'mlp' }
         ],
         deps: [
           'Relies on expensive scraping infrastructure — significant ongoing cost driver',
@@ -322,14 +395,14 @@ const WORKSTREAMS = [
         shortDesc: 'Automated DM sequences with reply tracking and follow-ups.',
         fullDesc: 'Automated DM sequences sent at scale with reply tracking, follow-up scheduling, and conversion tracking. Primary channel for converting discovered creators into active pipeline candidates. Currently running 112 DMs/week at DietFit — live proof of concept.',
         defaultStatus: 'live',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'Multi-step automated DM sequences',
-          'Reply detection and real-time tracking',
-          'Follow-up scheduling (time-based and behavior-triggered)',
-          'Conversion tracking: DM sent → replied → onboarded',
-          'Instagram DM automation (fully tested and operational)',
-          'Per-platform expansion (other platforms not yet automated)'
+          { text: 'Multi-step automated DM sequences', defaultTier: 'mvp' },
+          { text: 'Reply detection and real-time tracking', defaultTier: 'mvp' },
+          { text: 'Follow-up scheduling (time-based and behavior-triggered)', defaultTier: 'mlp' },
+          { text: 'Conversion tracking: DM sent → replied → onboarded', defaultTier: 'mlp' },
+          { text: 'Instagram DM automation (fully tested and operational)', defaultTier: 'mvp' },
+          { text: 'Per-platform expansion (TikTok, YouTube, Lemon8, X)', defaultTier: 'future' }
         ],
         deps: [
           'Instagram DM automation: tested and working today',
@@ -350,14 +423,14 @@ const WORKSTREAMS = [
         shortDesc: 'Per-brand creator recruitment pages at brand.pynchhq.com.',
         fullDesc: 'Per-brand creator recruitment pages at brand.pynchhq.com. Creators land here from DM outreach and apply. The landing page is just the visible surface — the real build is the entire backend system (creator DB, dashboard, file management, email triggers).',
         defaultStatus: 'live',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'Brand-specific landing page (front end) — this is the "live" part today',
-          'Creator application form and backend database',
-          'Creator dashboard: receive briefs, submit videos, communicate',
-          'File management system (video upload/download)',
-          'Google Drive integration (TBD)',
-          'Email triggers and automated notifications'
+          { text: 'Brand-specific landing page front end', defaultTier: 'mvp' },
+          { text: 'Creator application form and backend database', defaultTier: 'mvp' },
+          { text: 'Creator dashboard (receive briefs, submit videos, communicate)', defaultTier: 'mlp' },
+          { text: 'File management system (video upload/download)', defaultTier: 'mlp' },
+          { text: 'Google Drive integration', defaultTier: 'future' },
+          { text: 'Email triggers and automated notifications', defaultTier: 'mlp' }
         ],
         deps: [
           'Connected to Onboarding Flow — should be scoped together',
@@ -381,11 +454,11 @@ const WORKSTREAMS = [
         defaultStatus: 'planned',
         defaultTier: 'future',
         sub: [
-          'YouTube Shorts creator discovery',
-          'X (Twitter) creator search and outreach',
-          'Lemon8 integration',
-          'Unified cross-platform creator profiles',
-          'Platform-to-platform performance comparison'
+          { text: 'YouTube Shorts creator discovery', defaultTier: 'future' },
+          { text: 'X (Twitter) creator search and outreach', defaultTier: 'future' },
+          { text: 'Lemon8 integration', defaultTier: 'future' },
+          { text: 'Unified cross-platform creator profiles', defaultTier: 'future' },
+          { text: 'Platform-to-platform performance comparison', defaultTier: 'future' }
         ],
         deps: [
           'Each new platform needs its own scraping or API integration — high effort per platform',
@@ -406,10 +479,10 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Creator-facing brand and campaign discovery',
-          'Creator application flow to brand campaigns',
-          'Brand-side applicant review and selection UI',
-          'Marketplace matching algorithm'
+          { text: 'Creator-facing brand and campaign discovery', defaultTier: 'future' },
+          { text: 'Creator application flow to brand campaigns', defaultTier: 'future' },
+          { text: 'Brand-side applicant review and selection UI', defaultTier: 'future' },
+          { text: 'Marketplace matching algorithm', defaultTier: 'future' }
         ],
         deps: [
           'Requires significant Creator Portal to be built and adopted first',
@@ -440,14 +513,14 @@ const WORKSTREAMS = [
         shortDesc: 'Creator signs up → profile → agrees to terms → gets first brief.',
         fullDesc: 'Automated onboarding: creator signs up, completes profile, agrees to terms, receives first brief. No manual brand touchpoints required. Tightly interconnected with Branded Landing Pages — scope these together to avoid overload.',
         defaultStatus: 'building',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'Creator sign-up and account creation',
-          'Profile completion flow',
-          'Terms and agreements (click-to-agree)',
-          'First brief delivery trigger',
-          'Welcome email sequence',
-          'Onboarding status tracking for brand side'
+          { text: 'Creator sign-up and account creation', defaultTier: 'mvp' },
+          { text: 'Profile completion flow', defaultTier: 'mvp' },
+          { text: 'Terms and agreements (click-to-agree)', defaultTier: 'mvp' },
+          { text: 'First brief delivery trigger', defaultTier: 'mvp' },
+          { text: 'Welcome email sequence', defaultTier: 'mlp' },
+          { text: 'Onboarding status tracking for brand side', defaultTier: 'mlp' }
         ],
         deps: [
           'Depends on Branded Landing Pages backend being built',
@@ -470,12 +543,12 @@ const WORKSTREAMS = [
         defaultStatus: 'planned',
         defaultTier: 'mlp',
         sub: [
-          'Self-reported fields (niche, style, rates, availability)',
-          'Platform stats auto-pull (followers, engagement rate)',
-          'Past work portfolio section',
-          'Rate card and availability status',
-          'Clay-style enrichment layer (scrape + verify deeper data)',
-          'Enrichment tier gating (basic free, deep enrichment premium/token-based)'
+          { text: 'Self-reported fields (niche, style, rates, availability)', defaultTier: 'mvp' },
+          { text: 'Platform stats auto-pull (followers, engagement rate)', defaultTier: 'mlp' },
+          { text: 'Past work portfolio section', defaultTier: 'mlp' },
+          { text: 'Rate card and availability status', defaultTier: 'mlp' },
+          { text: 'Clay-style enrichment layer (scrape + verify deeper data)', defaultTier: 'future' },
+          { text: 'Enrichment tier gating (basic free, deep enrichment premium)', defaultTier: 'future' }
         ],
         deps: [
           'Basic profile fields: needed for Onboarding Flow to complete',
@@ -494,14 +567,14 @@ const WORKSTREAMS = [
         shortDesc: 'Auto-score creators on quality, consistency, reply rates.',
         fullDesc: 'Automated scoring for engagement quality, content consistency, and reply rates. Filter out flakes early. The key insight: a reliable 8/10 creator who responds fast may be more valuable than a 10/10 who is slow and difficult. Brand decides the weighting.',
         defaultStatus: 'planned',
-        defaultTier: 'future',
+        defaultTier: 'mlp',
         sub: [
-          'Engagement quality scoring (not just vanity metrics)',
-          'Content consistency scoring over time',
-          'Reply rate and turnaround time tracking',
-          '"Replies within 24 hours" reliability badge (Mercari-style)',
-          'Creator reliability score (behavioral signals)',
-          'Brand-configurable scoring weights (programmatic or manual)'
+          { text: 'Engagement quality scoring (not just vanity metrics)', defaultTier: 'mlp' },
+          { text: 'Content consistency scoring over time', defaultTier: 'mlp' },
+          { text: 'Reply rate and turnaround time tracking', defaultTier: 'mlp' },
+          { text: '"Replies within 24 hours" reliability badge (Mercari-style)', defaultTier: 'mlp' },
+          { text: 'Creator reliability score (behavioral signals)', defaultTier: 'mlp' },
+          { text: 'Brand-configurable scoring weights (programmatic or manual)', defaultTier: 'future' }
         ],
         deps: [
           'Creator Profiles must be built first to have data to score against',
@@ -525,11 +598,11 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'UGC shooting technique guides',
-          'Brief comprehension and checklist flows',
-          'Brand expectation setting content',
-          'Progressive coaching based on past performance gaps',
-          'Creator skill level tracking'
+          { text: 'UGC shooting technique guides', defaultTier: 'future' },
+          { text: 'Brief comprehension and checklist flows', defaultTier: 'future' },
+          { text: 'Brand expectation setting content', defaultTier: 'future' },
+          { text: 'Progressive coaching based on past performance gaps', defaultTier: 'future' },
+          { text: 'Creator skill level tracking', defaultTier: 'future' }
         ],
         deps: [
           'Creator Vetting/Scoring data feeds into what coaching to show each creator',
@@ -560,14 +633,14 @@ const WORKSTREAMS = [
         shortDesc: 'Create and send content briefs with templates.',
         fullDesc: 'Create and send content briefs with product info, creative direction, dos/don\'ts, and visual examples. Templatized for speed. Connected to Content Review for auto-screening submissions against the original brief.',
         defaultStatus: 'building',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'Brief creation interface with structured fields',
-          'Template library (by product type, campaign type)',
-          'Product info, creative direction, dos/don\'ts, visual examples',
-          'Brief versioning (revisions without losing history)',
-          'Brief-to-creator assignment and delivery',
-          'Brief performance tracking (submission rate, revision rate per brief)'
+          { text: 'Brief creation interface with structured fields', defaultTier: 'mvp' },
+          { text: 'Product info, creative direction, dos/don\'ts, visual examples', defaultTier: 'mvp' },
+          { text: 'Brief-to-creator assignment and delivery', defaultTier: 'mvp' },
+          { text: 'Template library (by product type, campaign type)', defaultTier: 'mlp' },
+          { text: 'Brief versioning (revisions without losing history)', defaultTier: 'mlp' },
+          { text: 'Brief performance tracking (submission rate, revision rate)', defaultTier: 'mlp' }
         ],
         deps: [
           'Connected to Content Review: briefs define the auto-screening criteria',
@@ -586,14 +659,14 @@ const WORKSTREAMS = [
         shortDesc: 'Creators submit videos/photos, tracked per brief.',
         fullDesc: 'Creators submit videos and photos tracked per brief. The key insight: creators need VISIBILITY into the process. Status must feel human, not cold. Creator needs to feel the video doesn\'t go into a void.',
         defaultStatus: 'planned',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'Creator-side submission interface (web + mobile)',
-          'File upload with progress indicator',
-          'Per-brief submission tracking and status',
-          'Status workflow: submitted → in review → approved / needs revision',
-          'Creator-facing status visibility (real-time, with timestamps)',
-          'Automated notifications at each status change'
+          { text: 'Creator-side submission interface (web + mobile)', defaultTier: 'mvp' },
+          { text: 'File upload with progress indicator', defaultTier: 'mvp' },
+          { text: 'Per-brief submission tracking and status', defaultTier: 'mvp' },
+          { text: 'Status workflow: submitted → in review → approved / needs revision', defaultTier: 'mvp' },
+          { text: 'Creator-facing status visibility (real-time, with timestamps)', defaultTier: 'mlp' },
+          { text: 'Automated notifications at each status change', defaultTier: 'mlp' }
         ],
         deps: [
           'File storage decision: Google Drive integration vs. custom storage',
@@ -616,14 +689,14 @@ const WORKSTREAMS = [
         shortDesc: 'Approve, reject, or request revisions with warm feedback.',
         fullDesc: 'Brand reviews content submissions. Approve, request revision (with templated or custom feedback), or reject. Auto-screening against brief criteria as the first gate — human review only for flagged or borderline content.',
         defaultStatus: 'planned',
-        defaultTier: 'future',
+        defaultTier: 'mlp',
         sub: [
-          'Brand-side review queue and batch review UI',
-          'Approve / request revision / reject actions',
-          'Revision feedback templates (warm and friendly by default)',
-          'Auto-screening gate: basic brief compliance check before human review',
-          'Review assignment to brand team members',
-          'SLA tracking: time from submission to review decision'
+          { text: 'Brand-side review queue and batch review UI', defaultTier: 'mlp' },
+          { text: 'Approve / request revision / reject actions', defaultTier: 'mlp' },
+          { text: 'Revision feedback templates (warm and friendly by default)', defaultTier: 'mlp' },
+          { text: 'Auto-screening gate: basic brief compliance check before human review', defaultTier: 'mlp' },
+          { text: 'Review assignment to brand team members', defaultTier: 'future' },
+          { text: 'SLA tracking: time from submission to review decision', defaultTier: 'future' }
         ],
         deps: [
           'Connected to Brief Builder: brief criteria define auto-screening rules',
@@ -645,13 +718,13 @@ const WORKSTREAMS = [
         shortDesc: 'Auto-check tech specs, brand compliance, brief alignment.',
         fullDesc: 'Auto-check submissions for technical specs (resolution, orientation, length), brand compliance, and brief alignment. Simple scoring for MVP: watch creator output against brief basics. Already have a Gemini gem doing something similar — evaluate before rebuilding.',
         defaultStatus: 'idea',
-        defaultTier: 'future',
+        defaultTier: 'mlp',
         sub: [
-          'Technical specs check (resolution, aspect ratio, duration)',
-          'Brand compliance scanning (brand assets visible, competitor products absent)',
-          'Brief alignment scoring',
-          'Simple pass/fail or flagged/unflagged output for human review queue',
-          'Confidence score (how certain is the AI about its assessment)'
+          { text: 'Technical specs check (resolution, aspect ratio, duration)', defaultTier: 'mlp' },
+          { text: 'Brief alignment scoring', defaultTier: 'mlp' },
+          { text: 'Simple pass/fail or flagged/unflagged output for review queue', defaultTier: 'mlp' },
+          { text: 'Brand compliance scanning (brand assets visible, competitor products absent)', defaultTier: 'future' },
+          { text: 'Confidence score (how certain is the AI about its assessment)', defaultTier: 'future' }
         ],
         deps: [
           'Content Review Workflow must exist for AI QA to feed into',
@@ -675,11 +748,11 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Content grid/list view with filters',
-          'Search by creator, campaign, product, date, performance',
-          'Tag and categorize approved content',
-          'Direct link to Post-Approval Distribution for scheduling',
-          'Usage rights tracking (where has each piece been used?)'
+          { text: 'Content grid/list view with filters', defaultTier: 'future' },
+          { text: 'Search by creator, campaign, product, date, performance', defaultTier: 'future' },
+          { text: 'Tag and categorize approved content', defaultTier: 'future' },
+          { text: 'Direct link to Post-Approval Distribution for scheduling', defaultTier: 'future' },
+          { text: 'Usage rights tracking (where has each piece been used?)', defaultTier: 'future' }
         ],
         deps: [
           'Content Review Workflow must be live — library only holds approved content',
@@ -700,12 +773,12 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Brand social account connection (Instagram, TikTok, YouTube)',
-          'Scheduling approved UGC from content library',
-          'Post-publish performance monitoring (views, engagement, saves)',
-          'Winner identification: flag organically performing content for ad spend',
-          '"Invest in this" signal: high organic = prioritize for paid boosting',
-          'ROI loop: track boosted content performance vs. organic baseline'
+          { text: 'Brand social account connection (Instagram, TikTok, YouTube)', defaultTier: 'future' },
+          { text: 'Scheduling approved UGC from content library', defaultTier: 'future' },
+          { text: 'Post-publish performance monitoring (views, engagement, saves)', defaultTier: 'future' },
+          { text: 'Winner identification: flag organically performing content for ad spend', defaultTier: 'future' },
+          { text: '"Invest in this" signal: high organic = prioritize for paid boosting', defaultTier: 'future' },
+          { text: 'ROI loop: track boosted content performance vs. organic baseline', defaultTier: 'future' }
         ],
         deps: [
           'Content Library must exist first — this is the scheduling layer on top',
@@ -735,16 +808,16 @@ const WORKSTREAMS = [
         id: 'creator-farm-view',
         title: 'Creator Farm View',
         shortDesc: 'See all creators, filter by status/niche/quality. Built for scale.',
-        fullDesc: 'See all creators in one place — filter by status, niche, output quality, and reliability score. Must be built for scale from day one: hundreds to thousands of creators per brand. The "Farm" view is Farm Mode\'s north star. Name TBD.',
+        fullDesc: 'See all creators in one place — filter by status, niche, output quality, and reliability score. Must be built for scale from day one: hundreds to thousands of creators per brand.',
         defaultStatus: 'planned',
         defaultTier: 'mlp',
         sub: [
-          'Creator grid/table view with key metrics',
-          'Filter by status (active, on brief, paused, churned)',
-          'Filter by niche, quality score, reliability score, platform',
-          'Sort by output rate, cost per video, engagement performance',
-          'Bulk actions (brief multiple creators, pause, archive)',
-          'Pagination/virtualization for 1,000+ creator lists'
+          { text: 'Creator grid/table view with key metrics', defaultTier: 'mlp' },
+          { text: 'Filter by status (active, on brief, paused, churned)', defaultTier: 'mlp' },
+          { text: 'Filter by niche, quality score, reliability score, platform', defaultTier: 'mlp' },
+          { text: 'Sort by output rate, cost per video, engagement performance', defaultTier: 'mlp' },
+          { text: 'Pagination/virtualization for 1,000+ creator lists', defaultTier: 'mlp' },
+          { text: 'Bulk actions (brief multiple creators, pause, archive)', defaultTier: 'future' }
         ],
         deps: [
           'Creator Profiles schema must be defined first',
@@ -768,12 +841,12 @@ const WORKSTREAMS = [
         defaultStatus: 'planned',
         defaultTier: 'mlp',
         sub: [
-          'Kanban or funnel view of all creator pipeline stages',
-          'Real-time counts at each stage',
-          'Stage-specific actions (follow up, move, pause)',
-          'Conversion rate between stages',
-          'Time-in-stage metrics (how long does average creator sit at each stage?)',
-          'Bottleneck identification (where are creators getting stuck?)'
+          { text: 'Kanban or funnel view of all creator pipeline stages', defaultTier: 'mlp' },
+          { text: 'Real-time counts at each stage', defaultTier: 'mlp' },
+          { text: 'Stage-specific actions (follow up, move, pause)', defaultTier: 'mlp' },
+          { text: 'Conversion rate between stages', defaultTier: 'future' },
+          { text: 'Time-in-stage metrics (how long does average creator sit at each stage?)', defaultTier: 'future' },
+          { text: 'Bottleneck identification (where are creators getting stuck?)', defaultTier: 'future' }
         ],
         deps: [
           'All upstream systems must be writing events to a shared state store',
@@ -797,12 +870,12 @@ const WORKSTREAMS = [
         defaultStatus: 'planned',
         defaultTier: 'future',
         sub: [
-          'Per-creator: CPV, CPI, ROAS, engagement rate on delivered content',
-          'Campaign rollups: total spend, total videos, cost per approved video',
-          'Operational health: submission speed, re-submission rate, brief accuracy over time',
-          'Creator reliability score (easy-to-work-with vs. high-performer)',
-          'Configurable brand-side metric weighting',
-          'Historical trend charts per creator and per campaign'
+          { text: 'Per-creator: CPV, CPI, ROAS, engagement rate on delivered content', defaultTier: 'future' },
+          { text: 'Campaign rollups: total spend, total videos, cost per approved video', defaultTier: 'future' },
+          { text: 'Operational health: submission speed, re-submission rate, brief accuracy', defaultTier: 'future' },
+          { text: 'Creator reliability score (easy-to-work-with vs. high-performer)', defaultTier: 'future' },
+          { text: 'Configurable brand-side metric weighting', defaultTier: 'future' },
+          { text: 'Historical trend charts per creator and per campaign', defaultTier: 'future' }
         ],
         deps: [
           'Analytics Infrastructure (Internal Infra) is the prerequisite — completely greenfield',
@@ -823,15 +896,15 @@ const WORKSTREAMS = [
         id: 'campaign-mode',
         title: 'Campaign Mode',
         shortDesc: 'Higher-value, lower-volume campaigns. Different creator tier.',
-        fullDesc: 'A different mode and creator tier from Farm Mode. Campaign Mode is about buying audience, not just buying content. Higher value, lower volume. $50/video commodity creators are not the target here — these are purpose-built activation campaigns.',
+        fullDesc: 'A different mode and creator tier from Farm Mode. Campaign Mode is about buying audience, not just buying content. Higher value, lower volume.',
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Separate campaign creation flow (not brief-based)',
-          'Higher-tier creator selection (different criteria, different pricing)',
-          'Campaign timeline and milestone tracking',
-          'Audience-reach metrics (not just content volume)',
-          'Campaign wrap report and ROI summary'
+          { text: 'Separate campaign creation flow (not brief-based)', defaultTier: 'future' },
+          { text: 'Higher-tier creator selection (different criteria, different pricing)', defaultTier: 'future' },
+          { text: 'Campaign timeline and milestone tracking', defaultTier: 'future' },
+          { text: 'Audience-reach metrics (not just content volume)', defaultTier: 'future' },
+          { text: 'Campaign wrap report and ROI summary', defaultTier: 'future' }
         ],
         deps: [
           'Farm Mode and pipeline dashboard must be stable before building Campaign Mode',
@@ -865,12 +938,12 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'mlp',
         sub: [
-          'Brand-scoped creator login',
-          'Brief inbox for active and completed briefs',
-          'Content submission UI (integrated with Content Collection)',
-          'Payment status view (what\'s pending, what\'s been paid)',
-          'Messaging / support channel with brand',
-          'Notification preferences'
+          { text: 'Brand-scoped creator login', defaultTier: 'mlp' },
+          { text: 'Brief inbox for active and completed briefs', defaultTier: 'mlp' },
+          { text: 'Content submission UI (integrated with Content Collection)', defaultTier: 'mlp' },
+          { text: 'Payment status view (what\'s pending, what\'s been paid)', defaultTier: 'mlp' },
+          { text: 'Notification preferences', defaultTier: 'mlp' },
+          { text: 'Messaging / support channel with brand', defaultTier: 'future' }
         ],
         deps: [
           'Branded Landing Pages backend infrastructure is the foundation for this',
@@ -896,11 +969,11 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Pending payment amounts and expected dates',
-          'Payment history with per-video breakdown',
-          'Upcoming brief pipeline (what\'s coming next)',
-          'Lifetime earnings summary',
-          'Payment dispute or question flow'
+          { text: 'Pending payment amounts and expected dates', defaultTier: 'future' },
+          { text: 'Payment history with per-video breakdown', defaultTier: 'future' },
+          { text: 'Upcoming brief pipeline (what\'s coming next)', defaultTier: 'future' },
+          { text: 'Lifetime earnings summary', defaultTier: 'future' },
+          { text: 'Payment dispute or question flow', defaultTier: 'future' }
         ],
         deps: [
           'Branded Creator Hub must be built first (this lives inside it)',
@@ -923,13 +996,13 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Public creator profile page (pynch.com/@handle or brand.pynchhq.com/@handle)',
-          'Auto-built portfolio from platform data (Pynch scrapes, creator just shares)',
-          'Live-updating stats (follower count, engagement rate, recent posts)',
-          'Pynch branding on every page ("Built with Pynch")',
-          'Creator affiliate link embedded in portfolio',
-          'Brand sign-up trigger when brand clicks through to learn more',
-          'Affiliate kickback when brand converts through creator\'s portfolio'
+          { text: 'Public creator profile page (pynch.com/@handle)', defaultTier: 'future' },
+          { text: 'Auto-built portfolio from platform data (Pynch scrapes, creator just shares)', defaultTier: 'future' },
+          { text: 'Live-updating stats (follower count, engagement rate, recent posts)', defaultTier: 'future' },
+          { text: 'Pynch branding on every page ("Built with Pynch")', defaultTier: 'future' },
+          { text: 'Creator affiliate link embedded in portfolio', defaultTier: 'future' },
+          { text: 'Brand sign-up trigger when brand clicks through to learn more', defaultTier: 'future' },
+          { text: 'Affiliate kickback when brand converts through creator\'s portfolio', defaultTier: 'future' }
         ],
         deps: [
           'Creator Profiles data is the foundation',
@@ -946,9 +1019,7 @@ const WORKSTREAMS = [
           'NEW from Neel/Khoa discussion — huge PLG opportunity',
           'THE PLG GROWTH PLAY: creator-led acquisition for the brand side',
           'Better than Canva portfolio because it\'s real data, live-updating, zero creator effort',
-          'Every portfolio page = Pynch ad to every brand who sees it',
-          'Step 1: Creator signs up free → gets portfolio. Step 2: Shares it. Step 3: Brand discovers Pynch.',
-          'Creators incentivized to actively sell Pynch to brands via affiliate kickback'
+          'Every portfolio page = Pynch ad to every brand who sees it'
         ]
       }
     ]
@@ -966,15 +1037,15 @@ const WORKSTREAMS = [
         shortDesc: 'Pay 50+ creators in one batch. Multi-currency.',
         fullDesc: 'Pay 50+ creators in a single batch operation. USD first, multi-currency later. Must account for non-US creators taking USD (FX fees) and who bears those fees. This must be configurable by the brand.',
         defaultStatus: 'building',
-        defaultTier: 'mlp',
+        defaultTier: 'mvp',
         sub: [
-          'Batch payment creation and execution',
-          'Per-creator payment tracking and status',
-          'USD support (day one)',
-          'Multi-currency support: VND, IDR, PHP, etc. (later)',
-          'Fee allocation config: who pays FX fees — brand or creator?',
-          'Payment confirmation and receipt generation',
-          'Failed payment handling and retry'
+          { text: 'Batch payment creation and execution', defaultTier: 'mvp' },
+          { text: 'Per-creator payment tracking and status', defaultTier: 'mvp' },
+          { text: 'USD support (day one)', defaultTier: 'mvp' },
+          { text: 'Payment confirmation and receipt generation', defaultTier: 'mvp' },
+          { text: 'Multi-currency support: VND, IDR, PHP, etc.', defaultTier: 'mlp' },
+          { text: 'Fee allocation config: who pays FX fees — brand or creator?', defaultTier: 'mlp' },
+          { text: 'Failed payment handling and retry', defaultTier: 'mlp' }
         ],
         deps: [
           'Payment provider selection: must be decided before building (buy vs. build)',
@@ -997,13 +1068,13 @@ const WORKSTREAMS = [
         shortDesc: 'Per-creator history, cost per video, budget tracking.',
         fullDesc: 'Per-creator payment history, cost-per-video analysis, and campaign budget tracking. Brands need to know their total UGC spend and cost efficiency at a glance.',
         defaultStatus: 'planned',
-        defaultTier: 'future',
+        defaultTier: 'mlp',
         sub: [
-          'Per-creator payment history',
-          'Cost per video (approved vs. attempted)',
-          'Budget allocation and tracking per campaign',
-          'Total spend dashboard with date range filters',
-          'Payment schedule view (upcoming batches)'
+          { text: 'Per-creator payment history', defaultTier: 'mlp' },
+          { text: 'Cost per video (approved vs. attempted)', defaultTier: 'mlp' },
+          { text: 'Budget allocation and tracking per campaign', defaultTier: 'mlp' },
+          { text: 'Total spend dashboard with date range filters', defaultTier: 'mlp' },
+          { text: 'Payment schedule view (upcoming batches)', defaultTier: 'mlp' }
         ],
         deps: [
           'Mass Payments must be live and writing payment records',
@@ -1024,11 +1095,11 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Click-to-agree standard terms (already have this)',
-          'Usage rights clauses (standard)',
-          'Bespoke contract workflow for high-value campaign creators',
-          'Contract version management',
-          'E-signature integration for bespoke contracts'
+          { text: 'Click-to-agree standard terms (already have this)', defaultTier: 'mvp' },
+          { text: 'Usage rights clauses (standard)', defaultTier: 'mvp' },
+          { text: 'Bespoke contract workflow for high-value campaign creators', defaultTier: 'future' },
+          { text: 'Contract version management', defaultTier: 'future' },
+          { text: 'E-signature integration for bespoke contracts', defaultTier: 'future' }
         ],
         deps: [
           'Onboarding Flow already includes click-to-agree — this is an extension, not from scratch',
@@ -1052,12 +1123,12 @@ const WORKSTREAMS = [
         defaultStatus: 'idea',
         defaultTier: 'future',
         sub: [
-          'Auto-generated brand invoices tied to approved content',
-          'Model A: Brand pays Pynch, Pynch pays creators (float + risk)',
-          'Model B: Back-to-back invoicing (risk in managing money)',
-          'Model C: PSP in the middle — most likely for now',
-          'Invoice PDF generation and delivery',
-          'Invoice reconciliation against payment records'
+          { text: 'Auto-generated brand invoices tied to approved content', defaultTier: 'future' },
+          { text: 'Model A: Brand pays Pynch, Pynch pays creators (float + risk)', defaultTier: 'future' },
+          { text: 'Model B: Back-to-back invoicing (risk in managing money)', defaultTier: 'future' },
+          { text: 'Model C: PSP in the middle — most likely for now', defaultTier: 'future' },
+          { text: 'Invoice PDF generation and delivery', defaultTier: 'future' },
+          { text: 'Invoice reconciliation against payment records', defaultTier: 'future' }
         ],
         deps: [
           'Payment flow model decision must happen before building',
@@ -1089,29 +1160,28 @@ const WORKSTREAMS = [
         shortDesc: 'Completely greenfield. Required for everything data-driven.',
         fullDesc: 'No analytics infrastructure exists today — completely greenfield. Required for performance tracking, creator scoring, pipeline dashboards, and every data-driven feature in the product. This is a prerequisite, not a feature.',
         defaultStatus: 'planned',
-        defaultTier: 'future',
+        defaultTier: 'mlp',
         sub: [
-          'Event tracking system (user actions, creator actions, content events)',
-          'Data warehouse or analytics store (Postgres + aggregations, or separate)',
-          'Real-time pipeline counts (for Pipeline Dashboard)',
-          'Creator scoring data pipeline',
-          'Campaign performance aggregation',
-          'Reporting query layer'
+          { text: 'Event tracking system (user actions, creator actions, content events)', defaultTier: 'mlp' },
+          { text: 'Data warehouse or analytics store (Postgres + aggregations)', defaultTier: 'mlp' },
+          { text: 'Real-time pipeline counts (for Pipeline Dashboard)', defaultTier: 'mlp' },
+          { text: 'Creator scoring data pipeline', defaultTier: 'mlp' },
+          { text: 'Reporting query layer', defaultTier: 'mlp' },
+          { text: 'Campaign performance aggregation', defaultTier: 'future' }
         ],
         deps: [
-          'This is a prerequisite for: Performance Tracking, Creator Vetting/Scoring, Pipeline Dashboard, Post-Approval Distribution, Payment Tracking',
+          'Prerequisite for: Performance Tracking, Creator Vetting/Scoring, Pipeline Dashboard, Post-Approval Distribution, Payment Tracking',
           'Architecture decision needed: event store approach (Kafka, Postgres events, etc.)',
           'Needs scoping before any data-dependent features are committed to timelines'
         ],
         oq: [
           'What is the simplest analytics infra that unblocks MVP data needs?',
           'Does Khoa have any event tracking or data pipelines today, or truly zero?',
-          'Third-party (Amplitude, Mixpanel, PostHog) vs. custom build vs. lightweight Postgres approach?'
+          'Third-party (Amplitude, Mixpanel, PostHog) vs. custom build vs. lightweight Postgres?'
         ],
         notes: [
           'NEW workstream from Neel/Khoa discussion',
           'Completely greenfield — no analytics infra exists today',
-          'Needed for performance tracking, scoring, everything data-driven',
           'This is infrastructure, not a product feature — but it unlocks huge product value'
         ]
       },
@@ -1121,14 +1191,14 @@ const WORKSTREAMS = [
         shortDesc: 'Creator discovery relies on expensive scraping. Must fix unit economics.',
         fullDesc: 'Creator discovery relies on expensive third-party scraping services. At scale, this becomes a significant unit economics problem. Need to optimize costs, find cheaper approaches, or build a sustainable cost model.',
         defaultStatus: 'planned',
-        defaultTier: 'future',
+        defaultTier: 'mlp',
         sub: [
-          'Audit current scraping cost per 1,000 profiles',
-          'Caching layer: don\'t re-scrape profiles that haven\'t changed',
-          'Tiered scraping: cheap basic pass first, expensive enrichment only when needed',
-          'Rate limiting and batching to reduce per-request costs',
-          'Evaluate alternative scraping providers or in-house solution',
-          'Customer cost-pass-through pricing model if costs can\'t be reduced'
+          { text: 'Audit current scraping cost per 1,000 profiles', defaultTier: 'mlp' },
+          { text: 'Caching layer: don\'t re-scrape profiles that haven\'t changed', defaultTier: 'mlp' },
+          { text: 'Tiered scraping: cheap basic pass first, expensive enrichment only when needed', defaultTier: 'mlp' },
+          { text: 'Rate limiting and batching to reduce per-request costs', defaultTier: 'mlp' },
+          { text: 'Evaluate alternative scraping providers or in-house solution', defaultTier: 'mlp' },
+          { text: 'Customer cost-pass-through pricing model', defaultTier: 'future' }
         ],
         deps: [
           'Creator Discovery depends on this — scale is blocked without cost optimization',
@@ -1141,7 +1211,6 @@ const WORKSTREAMS = [
           'How much of scraping cost can be legitimately passed to customers as a "data enrichment" feature?'
         ],
         notes: [
-          'NEW workstream from Neel/Khoa discussion',
           'Scraping cost is a real unit economics risk if not addressed before scale',
           'Caching + tiered approach is probably the fastest win before evaluating provider alternatives'
         ]
@@ -1196,8 +1265,22 @@ function setCardTier(id, tier) {
   saveState(state);
 }
 
+function getSubTier(featureId, subIndex, defaultTier) {
+  if (state[featureId] && state[featureId].subs && state[featureId].subs[subIndex] !== undefined) {
+    return state[featureId].subs[subIndex];
+  }
+  return defaultTier;
+}
+
+function setSubTier(featureId, subIndex, tier) {
+  if (!state[featureId]) state[featureId] = {};
+  if (!state[featureId].subs) state[featureId].subs = {};
+  state[featureId].subs[subIndex] = tier;
+  saveState(state);
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// RENDER
+// RENDER HELPERS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function renderList(items, sectionClass) {
   if (!items || items.length === 0) return '';
@@ -1214,13 +1297,63 @@ function renderSection(title, items, sectionClass) {
   `;
 }
 
+function renderSubFeatures(feature) {
+  if (!feature.sub || feature.sub.length === 0) return '';
+
+  const rows = feature.sub.map((sf, idx) => {
+    const tier = getSubTier(feature.id, idx, sf.defaultTier);
+    return `
+      <div class="sub-feature-row">
+        <span class="sub-feature-text">${sf.text}</span>
+        <span class="sub-tier-badge ${tier}"
+              onclick="cycleSubTier(event, '${feature.id}', ${idx})"
+              data-feature="${feature.id}" data-idx="${idx}"
+              title="Click to change tier">${TIER_LABELS[tier]}</span>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="detail-section section-sub-features" style="grid-column:1/-1">
+      <div class="detail-section-title">Sub-features</div>
+      <div class="sub-features-list">${rows}</div>
+    </div>
+  `;
+}
+
+function getSubTierCounts(feature) {
+  if (!feature.sub || feature.sub.length === 0) return null;
+  const counts = { mvp: 0, mlp: 0, future: 0 };
+  feature.sub.forEach((sf, idx) => {
+    const tier = getSubTier(feature.id, idx, sf.defaultTier);
+    counts[tier]++;
+  });
+  return counts;
+}
+
+function renderSubTierSummary(feature) {
+  const counts = getSubTierCounts(feature);
+  if (!counts) return '';
+
+  const chips = [];
+  if (counts.mvp > 0)    chips.push(`<span class="sub-tier-chip mvp">${counts.mvp} MVP</span>`);
+  if (counts.mlp > 0)    chips.push(`<span class="sub-tier-chip mlp">${counts.mlp} MLP</span>`);
+  if (counts.future > 0) chips.push(`<span class="sub-tier-chip future">${counts.future} Future</span>`);
+
+  if (chips.length === 0) return '';
+  return `<div class="sub-tier-summary" id="summary-${feature.id}">${chips.join('<span class="sub-tier-chip-sep">·</span>')}</div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RENDER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function renderCard(feature, wsId) {
   const status = getCardStatus(feature.id, feature.defaultStatus);
   const tier = getCardTier(feature.id, feature.defaultTier);
 
-  const hasSub = feature.sub && feature.sub.length > 0;
+  const hasSub  = feature.sub && feature.sub.length > 0;
   const hasDeps = feature.deps && feature.deps.length > 0;
-  const hasOq = feature.oq && feature.oq.length > 0;
+  const hasOq   = feature.oq && feature.oq.length > 0;
   const hasNotes = feature.notes && feature.notes.length > 0;
   const hasDetails = hasSub || hasDeps || hasOq || hasNotes;
 
@@ -1235,12 +1368,13 @@ function renderCard(feature, wsId) {
         <span class="tier-badge ${tier}" onclick="cycleTier(event, '${feature.id}')" title="Click to change tier">${TIER_LABELS[tier]}</span>
         <span class="status-tag" onclick="cycleStatus(event, '${feature.id}')" title="Click to change status">${STATUS_LABELS[status]}</span>
       </div>
+      ${renderSubTierSummary(feature)}
       ${hasDetails ? `
       <div class="card-details" id="details-${feature.id}">
         <div class="card-details-inner">
           <p class="detail-full-desc">${feature.fullDesc}</p>
           <div class="detail-grid">
-            ${renderSection('Sub-features', feature.sub, 'section-sub')}
+            ${renderSubFeatures(feature)}
             ${renderSection('Dependencies', feature.deps, 'section-dep')}
             ${renderSection('Open Questions', feature.oq, 'section-oq')}
             ${renderSection('Notes', feature.notes, 'section-notes')}
@@ -1285,7 +1419,6 @@ function toggleCard(id) {
   const isExpanded = card.classList.contains('expanded');
 
   if (isExpanded) {
-    // Collapse
     details.style.maxHeight = details.scrollHeight + 'px';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -1294,10 +1427,8 @@ function toggleCard(id) {
     });
     card.classList.remove('expanded');
   } else {
-    // Expand
     card.classList.add('expanded');
     details.style.maxHeight = details.scrollHeight + 'px';
-    // After transition, set to none to allow dynamic content
     details.addEventListener('transitionend', function handler() {
       if (card.classList.contains('expanded')) {
         details.style.maxHeight = 'none';
@@ -1314,7 +1445,6 @@ function cycleTier(event, id) {
   const next = TIER_CYCLE[nextIndex];
   setCardTier(id, next);
 
-  // Update badge in DOM without full re-render
   const badge = event.target;
   badge.className = 'tier-badge ' + next;
   badge.textContent = TIER_LABELS[next];
@@ -1328,12 +1458,60 @@ function cycleStatus(event, id) {
   const next = STATUS_CYCLE[nextIndex];
   setCardStatus(id, next);
 
-  // Update card class and status tag in DOM
   STATUS_CYCLE.forEach(s => card.classList.remove(s));
   card.classList.add(next);
 
   const tag = event.target;
   tag.textContent = STATUS_LABELS[next];
+}
+
+function cycleSubTier(event, featureId, subIndex) {
+  event.stopPropagation();
+  // Find the feature to get defaultTier for this sub
+  let defaultTier = 'future';
+  for (const ws of WORKSTREAMS) {
+    const f = ws.features.find(f => f.id === featureId);
+    if (f && f.sub && f.sub[subIndex]) {
+      defaultTier = f.sub[subIndex].defaultTier;
+      break;
+    }
+  }
+
+  const current = getSubTier(featureId, subIndex, defaultTier);
+  const nextIndex = (TIER_CYCLE.indexOf(current) + 1) % TIER_CYCLE.length;
+  const next = TIER_CYCLE[nextIndex];
+  setSubTier(featureId, subIndex, next);
+
+  // Update badge in DOM
+  const badge = event.target;
+  badge.className = 'sub-tier-badge ' + next;
+  badge.textContent = TIER_LABELS[next];
+
+  // Update the summary counter on the collapsed card
+  updateSubTierSummary(featureId);
+}
+
+function updateSubTierSummary(featureId) {
+  // Find the feature data
+  let feature = null;
+  for (const ws of WORKSTREAMS) {
+    feature = ws.features.find(f => f.id === featureId);
+    if (feature) break;
+  }
+  if (!feature) return;
+
+  const summaryEl = document.getElementById('summary-' + featureId);
+  if (!summaryEl) return;
+
+  const counts = getSubTierCounts(feature);
+  if (!counts) return;
+
+  const chips = [];
+  if (counts.mvp > 0)    chips.push(`<span class="sub-tier-chip mvp">${counts.mvp} MVP</span>`);
+  if (counts.mlp > 0)    chips.push(`<span class="sub-tier-chip mlp">${counts.mlp} MLP</span>`);
+  if (counts.future > 0) chips.push(`<span class="sub-tier-chip future">${counts.future} Future</span>`);
+
+  summaryEl.innerHTML = chips.join('<span class="sub-tier-chip-sep">·</span>');
 }
 
 // Init
