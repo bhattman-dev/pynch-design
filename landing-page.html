@@ -38,7 +38,7 @@
     ═══════════════════════════════════════════════════════ */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     a{text-decoration:none;} ul{list-style:none;}
-    html{scroll-behavior:auto;}
+    html{scroll-behavior:auto;overflow-x:hidden;width:100%;}
 
     /* ═══════════════════════════════════════════════════════
        BODY
@@ -516,7 +516,7 @@
     /* ═══════════════════════════════════════════════════════
        FOLDER CARDS SECTION
     ═══════════════════════════════════════════════════════ */
-    .folders-section{background:var(--grey-bg);padding-top:60px;padding-left:20px;padding-right:20px;position:relative;overflow:visible;z-index:1;}
+    .folders-section{background:var(--grey-bg);padding-top:60px;padding-left:20px;padding-right:20px;position:relative;overflow:visible;z-index:1;max-width:100vw;}
     .folder-wrapper{
       position:relative;margin:0;border-radius:24px;
       transform-origin:top center;will-change:transform;overflow:visible;
@@ -734,17 +734,18 @@
       .hero-email-form .hero-email-input{border-radius:14px 14px 0 0;padding:.7rem 1rem;}
       .hero-email-form .btn-accent{border-radius:14px;width:100%;padding:.75rem 1rem;}
       .btn-accent{width:100%;padding:.75rem 1rem;}
-      .card-field{height:55vh!important;min-height:380px!important;}
-      .creator-card:nth-child(1){left:-10%!important;right:auto!important;top:8%!important;width:52vw!important;min-width:0!important;transform:rotate(-5deg)!important;z-index:3!important;}
-      .creator-card:nth-child(2){left:50%!important;right:auto!important;top:0%!important;transform:translateX(-50%) rotate(1deg)!important;width:55vw!important;min-width:0!important;z-index:5!important;}
-      .creator-card:nth-child(3){right:-10%!important;left:auto!important;top:8%!important;width:52vw!important;min-width:0!important;transform:rotate(4deg)!important;z-index:3!important;}
+      .card-field{height:auto!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;gap:16px!important;align-items:center!important;}
+      .creator-card,
+      .creator-card:nth-child(1),
+      .creator-card:nth-child(2),
+      .creator-card:nth-child(3){position:relative!important;width:100%!important;max-width:300px!important;min-width:0!important;left:auto!important;right:auto!important;top:auto!important;transform:none!important;z-index:1!important;margin:0 auto!important;aspect-ratio:3/4!important;}
       .creator-card:nth-child(4){display:none!important;}
 
       /* folder cards */
       .folder-content{grid-template-columns:1fr;gap:36px;padding:120px 28px 56px 28px;min-height:auto;}
       .folder-ui{justify-content:center;padding-bottom:8px;}
       .card-reading-spacer{height:50vh;}
-      .mock-creator-card,.mock-kanban,.mock-analytics{width:100%;max-width:340px;transform:rotate(0deg);}
+      .mock-creator-card,.mock-kanban,.mock-analytics{width:100%;max-width:100%;transform:rotate(0deg);}
 
       /* timeline */
       .hz-title { font-size: 1.5rem; max-width: 260px; }
@@ -1133,6 +1134,43 @@
       .col-left,
       .col-right { --base-rotation: none; }
     }
+    @media(max-width:768px){
+      /* ── hz-section / problem timeline → vertical stack ── */
+      #hz-section { overflow: hidden !important; padding-top: 40px !important; }
+      #hz-sticky { height: auto !important; position: static !important; overflow: hidden !important; }
+      #hz-track { transform: none !important; width: 100% !important; display: block !important; position: static !important; }
+      #hz-cards-area {
+        width: 100% !important; height: auto !important;
+        display: flex !important; flex-direction: column !important;
+        gap: 20px !important; padding: 40px 20px !important; position: static !important;
+      }
+      .problem-card,
+      .problem-card:nth-child(n) {
+        position: relative !important; width: 100% !important; max-width: 340px !important; margin: 0 auto !important;
+        left: 0 !important; top: 0 !important; transform: none !important;
+        opacity: 1 !important; aspect-ratio: auto !important; height: auto !important;
+      }
+      #wire-overlay, #wire-svg { display: none !important; }
+      .scroll-hint { display: none !important; }
+
+      /* ── Folder cards → single column, contain overflow ── */
+      .folders-section { overflow: hidden !important; padding-left: 0 !important; padding-right: 0 !important; }
+      .folder-wrapper { overflow: hidden !important; border-radius: 16px !important; margin: 0 12px !important; }
+      .folder-wrapper svg.folder-bg { border-radius: 0 !important; }
+      .folder-content { display: flex !important; flex-direction: column !important; padding: 40px 20px !important; gap: 20px !important; min-height: auto !important; padding-top: 80px !important; }
+      .mock-creator-card, .mock-kanban, .mock-analytics { width: 100% !important; max-width: 340px !important; margin: 0 auto !important; transform: none !important; box-sizing: border-box !important; }
+      .card-reading-spacer { height: 20vh !important; }
+      .stacking-spacer { height: 100px !important; }
+
+      /* ── Comparison section ── */
+      .comparison-section { margin-top: 0 !important; overflow: hidden !important; }
+
+      /* ── Stickers — hide all on mobile ── */
+      .sticker { display: none !important; }
+
+      /* ── Hero adjustments ── */
+      .hero h1 { font-size: clamp(2.2rem,10vw,3rem); line-height: 1.1; margin-bottom: 0.8rem; }
+    }
   </style>
 </head>
 <body>
@@ -1221,7 +1259,7 @@
             <span class="card-label">organic views last month</span>
           </div>
           <video class="card-hover-video" muted loop playsinline preload="metadata" aria-hidden="true"
-            src="videos/hero-video-1.mp4"></video>
+            src="videos/faye_ugc.mp4"></video>
         </div>
         <!-- Card 3: Purple — static stat card (from vision doc) -->
         <div class="creator-card" style="background:#7B50C8;">
@@ -1241,7 +1279,7 @@
             <span class="card-label">avg response rate</span>
           </div>
           <video class="card-hover-video" muted loop playsinline preload="metadata" aria-hidden="true"
-            src="videos/hero-video-3.mp4"></video>
+            src="videos/edwin_ugc.mp4"></video>
         </div>
       </div>
     </header>
@@ -2202,20 +2240,22 @@ void main(){
   /* ═══════════════════════════════════════════════════════
      HERO CARDS: SCROLL PARALLAX
   ═══════════════════════════════════════════════════════ */
-  gsap.utils.toArray('.creator-card').forEach((card, i) => {
-    const direction = i % 2 === 0 ? -1 : 1;
-    gsap.to(card, {
-      y: direction * 60 + (i * 20),
-      rotation: `+=${direction * 3}`,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.card-field',
-        start: 'top center',
-        end: 'bottom top',
-        scrub: 1,
-      },
+  if (window.matchMedia('(min-width: 769px)').matches) {
+    gsap.utils.toArray('.creator-card').forEach((card, i) => {
+      const direction = i % 2 === 0 ? -1 : 1;
+      gsap.to(card, {
+        y: direction * 60 + (i * 20),
+        rotation: `+=${direction * 3}`,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.card-field',
+          start: 'top center',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      });
     });
-  });
+  }
 
   /* ═══════════════════════════════════════════════════════
      FAQ ACCORDION
@@ -2266,6 +2306,14 @@ void main(){
       const vw     = window.innerWidth;
       const vh     = window.innerHeight;
       const mobile = vw <= 768;
+
+      if (mobile) {
+        CARDS_DEF.forEach((c) => {
+          const el = document.getElementById(c.id);
+          if (el) { el.style = ""; gsap.set(el, { clearProps: "all" }); }
+        });
+        return;
+      }
 
       const CARD_W       = mobile ? 148 : 200;
       const CARD_H       = Math.round(CARD_W * (4 / 3));
